@@ -45,11 +45,13 @@ class JitManager(object):
         if not hasattr(obj, "_enabled"):
             obj._enabled = (
                 paddle.__version__ == "0.0.0"
-            ) and bool(os.getenv("to_static", "True").lower() == "true")
+            ) and bool(os.getenv("to_static", "False").lower() == "true")
         if not hasattr(obj, "_arch_mode"):
             obj._arch_mode = JitArchMode.ONLY_ACTIVATION
         if not hasattr(obj, "_use_cinn"):
-            obj._use_cinn = True
+            obj._use_cinn = (
+                paddle.__version__ == "0.0.0"
+            )
         if not hasattr(obj, "_use_prim"):
             obj._use_prim = False
         if not hasattr(obj, "_autograd_nodes"):
