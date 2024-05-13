@@ -1,14 +1,24 @@
 <!-- markdownlint-disable -->
-# Modulus Symbolic (Beta)
+# Modulus Symbolic (Beta)(Paddle Backend)
 
+<p align="center">
+<img src="https://pbs.twimg.com/profile_images/1145524454170062848/U4lxVYEw_400x400.png" alt="图片替代文本" height="100">
+<img src="https://github.com/PaddlePaddle/Paddle/blob/develop/doc/imgs/logo.png" alt="图片替代文本" height="100">
+</p>
+
+> [!IMPORTANT]
+> This branch(paddle) experimentally supports [Paddle backend](https://www.paddlepaddle.org.cn/en/install/quick?docurl=/documentation/docs/en/develop/install/pip/linux-pip_en.html) + CINN compiler
+> as almost all the core code has been completely rewritten using the Paddle API.
+>
+> It is recommended to install **nightly-build(develop)** Paddle before running any code in this branch.
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![GitHub](https://img.shields.io/github/license/NVIDIA/modulus-sym)](https://github.com/NVIDIA/modulus-sym/blob/master/LICENSE.txt)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Modulus Symbolic (Modulus Sym) provides pythonic APIs, algorithms and utilities to be used with Modulus core, to explicitly physics inform the model training. This includes symbolic APIs for PDEs, domain sampling and PDE-based residuals.  
+Modulus Symbolic (Modulus Sym) provides pythonic APIs, algorithms and utilities to be used with Modulus core, to explicitly physics inform the model training. This includes symbolic APIs for PDEs, domain sampling and PDE-based residuals.
 
-It also provides higher level abstraction to compose a training loop from specification of the geometry, PDEs and constraints like boundary conditions using simple symbolic APIs. 
+It also provides higher level abstraction to compose a training loop from specification of the geometry, PDEs and constraints like boundary conditions using simple symbolic APIs.
 Please refer to the [Lid Driven cavity](https://docs.nvidia.com/deeplearning/modulus/modulus-sym/user_guide/basics/lid_driven_cavity_flow.html) that illustrates the concept.
 Additional information can be found in the [Modulus documentation](https://docs.nvidia.com/modulus/index.html#sym).
 
@@ -26,7 +36,7 @@ for updating to the latest version.
 
 ## Installation
 
-### PyPi
+<!-- ### PyPi
 
 The recommended method for installing the latest version of Modulus Symbolic is using PyPi:
 
@@ -34,15 +44,15 @@ The recommended method for installing the latest version of Modulus Symbolic is 
 pip install nvidia-modulus.sym
 ```
 
-Note, the above method only works for x86/amd64 based architectures. For installing Modulus Sym on Arm based systems using pip, 
+Note, the above method only works for x86/amd64 based architectures. For installing Modulus Sym on Arm based systems using pip,
 Install VTK from source as shown [here](https://gitlab.kitware.com/vtk/vtk/-/blob/v9.2.6/Documentation/dev/build.md?ref_type=tags#python-wheels) and then install Modulus-Sym and other dependencies
 
 ```bash
 pip install nvidia-modulus.sym --no-deps
 pip install "hydra-core>=1.2.0" "termcolor>=2.1.1" "chaospy>=4.3.7" "Cython==0.29.28" "numpy-stl==2.16.3" "opencv-python==4.5.5.64" \
-    "scikit-learn==1.0.2" "symengine>=0.10.0" "sympy==1.12" "timm==0.5.4" "torch-optimizer==0.3.0" "transforms3d==0.3.1" \
+    "scikit-learn==1.0.2" "symengine>=0.10.0" "sympy==1.12" "timm==0.5.4" "paddlepaddle-gpu" "transforms3d==0.3.1" \
     "typing==3.7.4.3" "pillow==10.0.1" "notebook==6.4.12" "mistune==2.0.3" "pint==0.19.2" "tensorboard>=2.8.0"
-```
+``` -->
 
 ### Container
 
@@ -52,14 +62,14 @@ The recommended Modulus docker image can be pulled from the [NVIDIA Container Re
 docker pull nvcr.io/nvidia/modulus/modulus:24.04
 ```
 
-## From Source
+## From Source[Recommended]
 
 ### Package
 
 For a local build of the Modulus Symbolic Python package from source use:
 
 ```Bash
-git clone git@github.com:NVIDIA/modulus-sym.git && cd modulus-sym
+git clone -b paddle git@github.com:NVIDIA/modulus-sym.git && cd modulus-sym
 
 pip install --upgrade pip
 pip install .
@@ -73,7 +83,7 @@ Clone this repo, and download the Optix SDK from
 <https://developer.nvidia.com/designworks/optix/downloads/legacy>.
 
 ```bash
-git clone https://github.com/NVIDIA/modulus-sym.git
+git clone -b paddle https://github.com/NVIDIA/modulus-sym.git
 cd modulus-sym/ && mkdir deps
 ```
 
@@ -81,7 +91,7 @@ Currently Modulus supports v7.0. Place the Optix file in the deps directory and 
 executable. Also clone the pysdf library in the deps folder (NVIDIA Internal)
 
 ```bash
-chmod +x deps/NVIDIA-OptiX-SDK-7.0.0-linux64.sh 
+chmod +x deps/NVIDIA-OptiX-SDK-7.0.0-linux64.sh
 git clone <internal pysdf repo>
 ```
 
