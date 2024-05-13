@@ -165,7 +165,6 @@ def run(cfg: ModulusConfig) -> None:
             "v_2": 1.0,
         },  # weight edges to be zero
         criteria=Eq(y, height / 2),
-        loss=modulus.sym.loss.PointwiseLossNorm(name="top_wall"),
     )
     ldc_domain.add_constraint(top_wall, "top_wall")
 
@@ -176,7 +175,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"u_1": 0, "v_1": 0, "u_2": 0, "v_2": 0},
         batch_size=cfg.batch_size.NoSlip,
         criteria=y < height / 2,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="no_slip"),
     )
     ldc_domain.add_constraint(no_slip, "no_slip")
 
@@ -192,7 +190,6 @@ def run(cfg: ModulusConfig) -> None:
             "momentum_y_2": Symbol("sdf"),
         },
         criteria=y > 0,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="interior_2"),
     )
     ldc_domain.add_constraint(interior, "interior_2")
 
@@ -207,7 +204,6 @@ def run(cfg: ModulusConfig) -> None:
             "momentum_y_1": Symbol("sdf"),
         },
         criteria=y < 0,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="interior_1"),
     )
     ldc_domain.add_constraint(interior, "interior_1")
 
@@ -218,7 +214,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"dirichlet_u": 0, "dirichlet_v": 0, "dirichlet_p": 0},
         batch_size=cfg.batch_size.NoSlip,
         criteria=Eq(y, 0),
-        loss=modulus.sym.loss.PointwiseLossNorm(name="interface"),
     )
     ldc_domain.add_constraint(interface, "interface")
 

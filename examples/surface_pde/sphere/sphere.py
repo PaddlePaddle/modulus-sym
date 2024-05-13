@@ -92,7 +92,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"poisson_u": -18.0 * x * y * z, "flux_u": 0},
         batch_size=cfg.batch_size.surface,
         lambda_weighting={"poisson_u": 1.0, "flux_u": 1.0},
-        loss=modulus.sym.loss.PointwiseLossNorm(name="surface"),
     )
     domain.add_constraint(surface, "surface")
 
@@ -103,7 +102,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"u": 0.0},
         batch_size=2,
         lambda_weighting={"u": 1.0},
-        loss=modulus.sym.loss.PointwiseLossNorm(name="point"),
     )
     domain.add_constraint(point, "point")
 

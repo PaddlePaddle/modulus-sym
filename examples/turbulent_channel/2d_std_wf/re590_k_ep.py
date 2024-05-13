@@ -190,7 +190,6 @@ def run(cfg: ModulusConfig) -> None:
         },
         batch_size=cfg.batch_size.wf_pt,
         parameterization={"normal_distance": resolved_y_start},
-        loss=modulus.sym.loss.PointwiseLossNorm(name="WF"),
     )
     domain.add_constraint(wf_pt, "WF")
 
@@ -214,7 +213,6 @@ def run(cfg: ModulusConfig) -> None:
         },
         batch_size=cfg.batch_size.interior,
         bounds={x: channel_length, y: channel_width},
-        loss=modulus.sym.loss.PointwiseLossNorm(name="Interior"),
     )
     domain.add_constraint(interior, "Interior")
 
@@ -225,7 +223,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"p": p_grad * (channel_length[1] - channel_length[0])},
         lambda_weighting={"p": 10},
         batch_size=cfg.batch_size.inlet,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="Inlet"),
     )
     domain.add_constraint(inlet, "Inlet")
 
@@ -236,7 +233,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"p": 0},
         lambda_weighting={"p": 10},
         batch_size=cfg.batch_size.outlet,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="Outlet"),
     )
     domain.add_constraint(outlet, "Outlet")
 
@@ -247,7 +243,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"u_init": 0, "v_init": 0, "k_init": 0, "p_init": 0, "ep_init": 0},
         batch_size=cfg.batch_size.interior_init,
         bounds={x: channel_length, y: channel_width},
-        loss=modulus.sym.loss.PointwiseLossNorm(name="InteriorInit"),
     )
     domain.add_constraint(interior, "InteriorInit")
 

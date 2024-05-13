@@ -85,7 +85,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"u": nd_inlet_velocity, "v": 0, "w": 0},
         batch_size=cfg.batch_size.inlet,
         lambda_weighting={"u": channel_sdf, "v": 1.0, "w": 1.0},
-        loss=modulus.sym.loss.PointwiseLossNorm(name="inlet"),
     )
     flow_domain.add_constraint(inlet, "inlet")
 
@@ -95,7 +94,6 @@ def run(cfg: ModulusConfig) -> None:
         geometry=limerock.outlet,
         outvar={"p": 0},
         batch_size=cfg.batch_size.outlet,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="outlet"),
     )
     flow_domain.add_constraint(outlet, "outlet")
 
@@ -106,7 +104,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"u": 0, "v": 0, "w": 0},
         batch_size=cfg.batch_size.no_slip,
         batch_per_epoch=15000,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="no_slip"),
     )
     flow_domain.add_constraint(no_slip, "no_slip")
 
@@ -127,7 +124,6 @@ def run(cfg: ModulusConfig) -> None:
             (x < limerock.heat_sink_bounds[0]), (x > limerock.heat_sink_bounds[1])
         ),
         batch_per_epoch=2000,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="lr_interior"),
     )
     flow_domain.add_constraint(lr_interior, "lr_interior")
 
@@ -148,7 +144,6 @@ def run(cfg: ModulusConfig) -> None:
             (x > limerock.heat_sink_bounds[0]), (x < limerock.heat_sink_bounds[1])
         ),
         batch_per_epoch=2000,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="hr_interior"),
     )
     flow_domain.add_constraint(hr_interior, "hr_interior")
 
@@ -165,7 +160,6 @@ def run(cfg: ModulusConfig) -> None:
         integral_batch_size=cfg.batch_size.integral_continuity,
         lambda_weighting={"normal_dot_vel": 0.1},
         criteria=integral_criteria,
-        loss=modulus.sym.loss.IntegralLossNorm(name="integral_continuity"),
     )
     flow_domain.add_constraint(integral_continuity, "integral_continuity")
 

@@ -174,7 +174,6 @@ def run(cfg: ModulusConfig) -> None:
         geometry=inlet,
         outvar={"u": nd_inlet_velocity, "v": 0},
         batch_size=cfg.batch_size.inlet,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="inlet"),
     )
     domain.add_constraint(inlet, "inlet")
 
@@ -185,7 +184,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"p": 0},
         batch_size=cfg.batch_size.outlet,
         criteria=Eq(x, channel_length[1]),
-        loss=modulus.sym.loss.PointwiseLossNorm(name="outlet"),
     )
     domain.add_constraint(outlet, "outlet")
 
@@ -195,7 +193,6 @@ def run(cfg: ModulusConfig) -> None:
         geometry=geo,
         outvar={"u": 0, "v": 0},
         batch_size=cfg.batch_size.no_slip,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="no_slip"),
     )
     domain.add_constraint(no_slip, "no_slip")
 
@@ -211,7 +208,6 @@ def run(cfg: ModulusConfig) -> None:
             "momentum_x": 2 * Symbol("sdf"),
             "momentum_y": 2 * Symbol("sdf"),
         },
-        loss=modulus.sym.loss.PointwiseLossNorm(name="interior_lr"),
     )
     domain.add_constraint(interior_lr, "interior_lr")
 
@@ -227,7 +223,6 @@ def run(cfg: ModulusConfig) -> None:
             "momentum_x": 2 * Symbol("sdf"),
             "momentum_y": 2 * Symbol("sdf"),
         },
-        loss=modulus.sym.loss.PointwiseLossNorm(name="interior_hr"),
     )
     domain.add_constraint(interior_hr, "interior_hr")
 
@@ -245,7 +240,6 @@ def run(cfg: ModulusConfig) -> None:
         lambda_weighting={"normal_dot_vel": 1},
         criteria=integral_criteria,
         parameterization=x_pos_range,
-        loss=modulus.sym.loss.IntegralLossNorm(name="integral_continuity"),
     )
     domain.add_constraint(integral_continuity, "integral_continuity")
 

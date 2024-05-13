@@ -114,7 +114,6 @@ def run(cfg: ModulusConfig) -> None:
         criteria=Eq(x, channel_origin[0]),
         lambda_weighting={"theta_f": 1.0},  # weight zero on edges
         parameterization=geo.pr,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="inlet"),
     )
     thermal_domain.add_constraint(constraint_inlet, "inlet")
 
@@ -127,7 +126,6 @@ def run(cfg: ModulusConfig) -> None:
         criteria=Eq(x, channel_origin[0] + channel_dim[0]),
         lambda_weighting={"normal_gradient_theta_f": 1.0},  # weight zero on edges
         parameterization=geo.pr,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="outlet"),
     )
     thermal_domain.add_constraint(constraint_outlet, "outlet")
 
@@ -144,7 +142,6 @@ def run(cfg: ModulusConfig) -> None:
         criteria=wall_criteria,
         lambda_weighting={"normal_gradient_theta_f": 1.0},
         parameterization=geo.pr,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="channel_walls"),
     )
     thermal_domain.add_constraint(channel_walls, "channel_walls")
 
@@ -163,7 +160,6 @@ def run(cfg: ModulusConfig) -> None:
         batch_size=cfg.batch_size.SolidInterface,
         criteria=interface_criteria,
         parameterization=geo.pr,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="fluid_solid_interface"),
     )
     thermal_domain.add_constraint(fluid_solid_interface, "fluid_solid_interface")
 
@@ -186,7 +182,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"normal_gradient_theta_s": gradient_normal},
         batch_size=cfg.batch_size.HeatSource,
         criteria=Eq(y, source_origin[1]),
-        loss=modulus.sym.loss.PointwiseLossNorm(name="heat_source"),
     )
     thermal_domain.add_constraint(heat_source, "heat_source")
 
@@ -197,7 +192,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"advection_diffusion_theta_f": 0},
         batch_size=cfg.batch_size.InteriorLR,
         criteria=Or(x < -1.1, x > 0.5),
-        loss=modulus.sym.loss.PointwiseLossNorm(name="lr_flow_interior"),
     )
     thermal_domain.add_constraint(lr_flow_interior, "lr_flow_interior")
 
@@ -208,7 +202,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"advection_diffusion_theta_f": 0},
         batch_size=cfg.batch_size.InteriorHR,
         criteria=And(x > -1.1, x < 0.5),
-        loss=modulus.sym.loss.PointwiseLossNorm(name="hr_flow_interior"),
     )
     thermal_domain.add_constraint(hr_flow_interior, "hr_flow_interior")
 
@@ -219,7 +212,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"diffusion_theta_s": 0},
         batch_size=cfg.batch_size.SolidInterior,
         lambda_weighting={"diffusion_theta_s": 100.0},
-        loss=modulus.sym.loss.PointwiseLossNorm(name="solid_interior"),
     )
     thermal_domain.add_constraint(solid_interior, "solid_interior")
 

@@ -135,7 +135,6 @@ def run(cfg: ModulusConfig) -> None:
         invar=invar,
         outvar=outvar,
         batch_size=10000,
-        num_workers=0,
     )
     domain.add_constraint(train, "LogLawLoss")
 

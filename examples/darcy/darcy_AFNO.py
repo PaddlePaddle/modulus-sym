@@ -85,8 +85,6 @@ def run(cfg: ModulusConfig) -> None:
         nodes=nodes,
         dataset=train_dataset,
         batch_size=cfg.batch_size.grid,
-        num_workers=0,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="supervised"),
     )
     domain.add_constraint(supervised, "supervised")
 

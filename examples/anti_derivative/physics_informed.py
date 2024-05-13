@@ -90,7 +90,6 @@ def run(cfg: ModulusConfig) -> None:
         invar={"a": a_train, "x": np.zeros_like(x_train)},
         outvar={"u": np.zeros_like(u_train)},
         batch_size=cfg.batch_size.train,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="IC"),
     )
     domain.add_constraint(IC, "IC")
     # [constraint1]
@@ -101,7 +100,6 @@ def run(cfg: ModulusConfig) -> None:
         invar={"a": a_r_train, "x": x_r_train},
         outvar={"u__x": u_r_train},
         batch_size=cfg.batch_size.train,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="Residual"),
     )
     domain.add_constraint(interior, "Residual")
     # [constraint2]

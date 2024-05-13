@@ -72,7 +72,6 @@ def run(cfg: ModulusConfig) -> None:
         lambda_weighting={"u": 100.0, "u__t": 1.0},
         parameterization={t_symbol: 0.0},
         num_workers=4,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="IC"),
     )
     domain.add_constraint(IC, "IC")
 
@@ -84,7 +83,6 @@ def run(cfg: ModulusConfig) -> None:
         batch_size=cfg.batch_size.BC,
         lambda_weighting={"u": 100.0},
         num_workers=4,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="BC"),
     )
     domain.add_constraint(BC, "BC")
 

@@ -70,7 +70,6 @@ def run(cfg: ModulusConfig) -> None:
             "x3__t": 1.0,
         },
         parameterization={t_symbol: 0},
-        loss=modulus.sym.loss.PointwiseLossNorm(name="IC"),
     )
     domain.add_constraint(IC, name="IC")
 
@@ -81,7 +80,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"ode_x1": 0.0, "ode_x2": 0.0, "ode_x3": 0.0},
         batch_size=cfg.batch_size.interior,
         parameterization=time_range,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="interior"),
     )
     domain.add_constraint(interior, "interior")
 

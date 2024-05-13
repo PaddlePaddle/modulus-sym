@@ -84,7 +84,6 @@ def run(cfg: ModulusConfig) -> None:
         invar={"a": a_train, "x": x_train},
         outvar={"u": u_train},
         batch_size=cfg.batch_size.train,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="data"),
     )
     domain.add_constraint(data, "data")
     # [constraint]

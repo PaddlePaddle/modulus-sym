@@ -144,7 +144,6 @@ def run(cfg: ModulusConfig) -> None:
             "compatibility_u_x": 0.5,
             "compatibility_u_y": 0.5,
         },
-        loss=modulus.sym.loss.PointwiseLossNorm(name="interior"),
     )
     domain.add_constraint(interior, "interior")
 

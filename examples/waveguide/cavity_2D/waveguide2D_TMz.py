@@ -82,7 +82,6 @@ def run(cfg: ModulusConfig) -> None:
         batch_size=cfg.batch_size.PEC,
         lambda_weighting={"u": 100.0},
         criteria=Or(Eq(y, 0), Eq(y, height)),
-        loss=modulus.sym.loss.PointwiseLossNorm(name="PEC"),
     )
 
     waveguide_domain.add_constraint(PEC, "PEC")
@@ -94,7 +93,6 @@ def run(cfg: ModulusConfig) -> None:
         batch_size=cfg.batch_size.Waveguide_port,
         lambda_weighting={"u": 100.0},
         criteria=Eq(x, 0),
-        loss=modulus.sym.loss.PointwiseLossNorm(name="Waveguide_port"),
     )
     waveguide_domain.add_constraint(Waveguide_port, "Waveguide_port")
 
@@ -105,7 +103,6 @@ def run(cfg: ModulusConfig) -> None:
         batch_size=cfg.batch_size.ABC,
         lambda_weighting={"normal_gradient_u": 10.0},
         criteria=Eq(x, width),
-        loss=modulus.sym.loss.PointwiseLossNorm(name="ABC"),
     )
     waveguide_domain.add_constraint(ABC, "ABC")
 
@@ -118,7 +115,6 @@ def run(cfg: ModulusConfig) -> None:
         lambda_weighting={
             "helmholtz": 1.0 / wave_number**2,
         },
-        loss=modulus.sym.loss.PointwiseLossNorm(name="Interior"),
     )
     waveguide_domain.add_constraint(Interior, "Interior")
 

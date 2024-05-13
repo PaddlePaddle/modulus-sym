@@ -78,7 +78,6 @@ def run(cfg: ModulusConfig) -> None:
         invar=invar_numpy,
         outvar=outvar_numpy,
         batch_size=cfg.batch_size.data,
-        num_workers=0,
     )
     domain.add_constraint(data, "interior_data")
 

@@ -68,7 +68,6 @@ def run(cfg: ModulusConfig) -> None:
         batch_size=cfg.batch_size.TopWall,
         lambda_weighting={"u": 1.0 - 20 * Abs(x), "v": 1.0},  # weight edges to be zero
         criteria=Eq(y, height / 2),
-        loss=modulus.sym.loss.PointwiseLossNorm(name="top_wall"),
     )
     ldc_domain.add_constraint(top_wall, "top_wall")
 
@@ -79,7 +78,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"u": 0, "v": 0},
         batch_size=cfg.batch_size.NoSlip,
         criteria=y < height / 2,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="no_slip"),
     )
     ldc_domain.add_constraint(no_slip, "no_slip")
 
@@ -94,7 +92,6 @@ def run(cfg: ModulusConfig) -> None:
             "momentum_x": Symbol("sdf"),
             "momentum_y": Symbol("sdf"),
         },
-        loss=modulus.sym.loss.PointwiseLossNorm(name="interior"),
     )
     ldc_domain.add_constraint(interior, "interior")
 

@@ -121,7 +121,6 @@ def run(cfg: ModulusConfig) -> None:
         geometry=inlet,
         outvar={"u": nd.ndim(inlet_u), "v": nd.ndim(inlet_v)},
         batch_size=cfg.batch_size.inlet,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="inlet"),
     )
     domain.add_constraint(inlet, "inlet")
 
@@ -131,7 +130,6 @@ def run(cfg: ModulusConfig) -> None:
         geometry=outlet,
         outvar={"p": nd.ndim(outlet_p)},
         batch_size=cfg.batch_size.outlet,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="outlet"),
     )
     domain.add_constraint(outlet, "outlet")
 
@@ -141,7 +139,6 @@ def run(cfg: ModulusConfig) -> None:
         geometry=channel,
         outvar={"u": nd.ndim(inlet_u), "v": nd.ndim(inlet_v)},
         batch_size=cfg.batch_size.walls,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="walls"),
     )
     domain.add_constraint(walls, "walls")
 
@@ -151,7 +148,6 @@ def run(cfg: ModulusConfig) -> None:
         geometry=cylinder,
         outvar={"u": nd.ndim(noslip_u), "v": nd.ndim(noslip_v)},
         batch_size=cfg.batch_size.no_slip,
-        loss=modulus.sym.loss.PointwiseLossNorm(name="no_slip"),
     )
     domain.add_constraint(no_slip, "no_slip")
 
@@ -162,7 +158,6 @@ def run(cfg: ModulusConfig) -> None:
         outvar={"continuity": 0, "momentum_x": 0, "momentum_y": 0},
         batch_size=cfg.batch_size.interior,
         bounds=Bounds({x: channel_length_nd, y: channel_width_nd}),
-        loss=modulus.sym.loss.PointwiseLossNorm(name="interior"),
     )
     domain.add_constraint(interior, "interior")
 

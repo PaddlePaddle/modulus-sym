@@ -98,7 +98,6 @@ def run(cfg: ModulusConfig) -> None:
         batch_size=cfg.batch_size.inlet,
         batch_per_epoch=4000,
         criteria=Eq(x, channel_length[0]),
-        loss=modulus.sym.loss.PointwiseLossNorm(name="inlet"),
     )
     domain.add_constraint(inlet, "inlet")
 
@@ -110,7 +109,6 @@ def run(cfg: ModulusConfig) -> None:
         batch_size=cfg.batch_size.outlet,
         batch_per_epoch=4000,
         criteria=Eq(x, channel_length[1]),
-        loss=modulus.sym.loss.PointwiseLossNorm(name="outlet"),
     )
     domain.add_constraint(outlet, "outlet")
 
@@ -122,7 +120,6 @@ def run(cfg: ModulusConfig) -> None:
         batch_size=cfg.batch_size.no_slip,
         batch_per_epoch=4000,
         criteria=(x > channel_length[0]) & (x < channel_length[1]),
-        loss=modulus.sym.loss.PointwiseLossNorm(name="no_slip"),
     )
     domain.add_constraint(no_slip, "no_slip")
 
@@ -138,7 +135,6 @@ def run(cfg: ModulusConfig) -> None:
             "momentum_x": Symbol("sdf"),
             "momentum_y": Symbol("sdf"),
         },
-        loss=modulus.sym.loss.PointwiseLossNorm(name="interior"),
     )
     domain.add_constraint(interior, "interior")
 
@@ -151,7 +147,6 @@ def run(cfg: ModulusConfig) -> None:
         integral_batch_size=cfg.batch_size.integral_continuity,
         lambda_weighting={"normal_dot_vel": 0.1},
         criteria=Eq(x, channel_length[1]),
-        loss=modulus.sym.loss.IntegralLossNorm(name="integral_continuity"),
     )
     domain.add_constraint(integral_continuity, "integral_continuity")
 
