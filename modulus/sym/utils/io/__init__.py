@@ -31,4 +31,3 @@ from .plotter import (
     DeepONetValidatorPlotter,
 )
 from .csv_rw import csv_to_dict, dict_to_csv
-from .weight_convert import torch_to_paddle
