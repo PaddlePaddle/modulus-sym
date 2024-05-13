@@ -683,8 +683,7 @@ class Trainer(AdamMixin, AdaHessianMixin, BFGSMixin):
 
                     # print statement
                     print_statement = (
-                        # f'{self.step_str} loss: {float(loss):.10f}'
-                        f"{self.step_str} lr: {self.optimizer.get_lr():.10.3e}, loss: {float(loss):.10.3e}"
+                        f"{self.step_str} lr: {self.optimizer.get_lr():10.3e}, loss: {float(loss):10.3e}"
                     )
                     eta_sec = (self.max_steps - step) * (elapsed_time / self.print_stats_freq) / 1000
                     eta_str = str(datetime.timedelta(seconds=int(eta_sec)))
