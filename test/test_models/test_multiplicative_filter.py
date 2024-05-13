@@ -23,7 +23,7 @@ import numpy as np
 from pathlib import Path
 from modulus.sym.key import Key
 import pytest
-from model_test_utils import validate_func_arch_net
+from .model_test_utils import validate_func_arch_net
 
 dir_path = Path(__file__).parent
 

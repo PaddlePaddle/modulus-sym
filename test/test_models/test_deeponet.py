@@ -24,7 +24,7 @@ from modulus.sym.key import Key
 import pytest
 from modulus.sym.graph import Graph
 from modulus.sym.models.arch import FuncArch
-from model_test_utils import validate_func_arch_net
+from .model_test_utils import validate_func_arch_net
 
 _ = paddle.seed(seed=0)
 device = str("cuda:0" if paddle.device.cuda.device_count() >= 1 else "cpu").replace(
