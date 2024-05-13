@@ -69,7 +69,7 @@ docker pull nvcr.io/nvidia/modulus/modulus:24.04
 For a local build of the Modulus Symbolic Python package from source use:
 
 ```Bash
-git clone -b paddle git@github.com:NVIDIA/modulus-sym.git && cd modulus-sym
+git clone -b paddle https://github.com/PaddlePaddle/modulus-sym.git && cd modulus-sym
 
 pip install --upgrade pip
 pip install .
@@ -83,7 +83,7 @@ Clone this repo, and download the Optix SDK from
 <https://developer.nvidia.com/designworks/optix/downloads/legacy>.
 
 ```bash
-git clone -b paddle https://github.com/NVIDIA/modulus-sym.git
+git clone -b paddle https://github.com/PaddlePaddle/modulus-sym.git
 cd modulus-sym/ && mkdir deps
 ```
 
