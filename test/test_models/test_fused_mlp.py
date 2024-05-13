@@ -44,6 +44,7 @@ def make_dict(nr_layers):
     return _dict
 
 
+@pytest.mark.skip(reason="tinycudann does not support paddle yet.")
 @pytest.mark.parametrize("layer_size", layer_size_params)
 def test_fully_fused_mlp(layer_size):
     batch_size = 1024
@@ -76,6 +77,7 @@ def test_fully_fused_mlp(layer_size):
     # assert np.allclose(data_out1, data_out2, rtol=1e-3), "Test failed!"
 
 
+@pytest.mark.skip(reason="tinycudann does not support paddle yet.")
 @pytest.mark.parametrize("layer_size", layer_size_params)
 def test_fused_fourier_net(layer_size):
     batch_size = 1024
@@ -109,6 +111,7 @@ def test_fused_fourier_net(layer_size):
     # assert np.allclose(data_out1, data_out2, rtol=1e-3), "Test failed!"
 
 
+@pytest.mark.skip(reason="tinycudann does not support paddle yet.")
 @pytest.mark.parametrize("layer_size", layer_size_params)
 def test_fused_grid_encoding_net(layer_size):
     batch_size = 1024
@@ -149,7 +152,7 @@ def test_fused_grid_encoding_net(layer_size):
 
 
 if __name__ == "__main__":
-    ...
+    pytest.main()
     # Fused MLP tests
     # test_fully_fused_mlp(128)  # Fully Fused MLP
     # test_fully_fused_mlp(256)  # Cutlass MLP

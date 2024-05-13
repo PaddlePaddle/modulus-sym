@@ -29,7 +29,6 @@ except:
     print(
         "Error importing pysdf. Make sure 'libsdf.so' is in LD_LIBRARY_PATH and pysdf is installed"
     )
-    raise
 
 from .geometry import Geometry
 from .parameterization import Parameterization, Bounds, Parameter

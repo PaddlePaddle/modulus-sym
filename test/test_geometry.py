@@ -45,6 +45,9 @@ from modulus.sym.utils.io.vtk import var_to_polyvtk
 
 dir_path = Path(__file__).parent
 
+import pytest
+import importlib
+
 
 def check_geometry(
     geo,
@@ -204,6 +207,12 @@ def test_primitives():
         max_sdf=0.5,
     )
 
+
+@pytest.mark.skipif(
+    (importlib.util.find_spec("pysdf") is None) or (getattr(importlib.util.find_spec("pysdf"), "sdf", None) is None),
+    reason="nvidia-modulus pysdf not installed",
+)
+def test_Tessellation():
     # tessellated geometry
     g = Tessellation.from_stl(dir_path / "stls/cube.stl")
     check_geometry(g, boundary_area=6, interior_area=1.0, max_sdf=0.5)
@@ -245,4 +254,5 @@ def test_primitives():
     )
 
 
-test_primitives()
+if __name__ == "__main__":
+    pytest.main()

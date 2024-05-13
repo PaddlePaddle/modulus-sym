@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 import paddle
 from paddle import nn
 
@@ -285,6 +286,7 @@ class SpectralConv3d_old(nn.Layer):
         return x
 
 
+@pytest.mark.skip(reason="Paddle does not support generating random complex numbers yet.")
 def test_spectral_convs():
 
     in_channels = 2
@@ -381,4 +383,7 @@ def test_spectral_convs():
     ).item(), "Spectral conv 3d mismatch"
 
 
-test_spectral_convs()
+# test_spectral_convs()
+
+if __name__ == "__main__":
+    pytest.main()
