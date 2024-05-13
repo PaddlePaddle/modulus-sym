@@ -65,22 +65,22 @@ def main(config_path: str, config_name: str = "config"):
         @functools.wraps(func)
         def func_decorated(cfg_passthrough: Optional[DictConfig] = None) -> Any:
 
-            # Fix all random seed
-            GLOBAL_RANDOM_SEED = 42
-            random.seed(GLOBAL_RANDOM_SEED)  # Python random module.
-            np.random.seed(GLOBAL_RANDOM_SEED)  # Numpy module.
-            paddle.seed(GLOBAL_RANDOM_SEED) # Paddle random.
-            print(f"✨ ✨ Set global random seed to {GLOBAL_RANDOM_SEED}")
+            # # Fix all random seed
+            # GLOBAL_RANDOM_SEED = 42
+            # random.seed(GLOBAL_RANDOM_SEED)  # Python random module.
+            # np.random.seed(GLOBAL_RANDOM_SEED)  # Numpy module.
+            # paddle.seed(GLOBAL_RANDOM_SEED) # Paddle random.
+            # print(f"✨ ✨ Set global random seed to {GLOBAL_RANDOM_SEED}")
             # os.environ['PYTHONHASHSEED'] = str(GLOBAL_RANDOM_SEED)
 
             # Enable prim mode
             use_prim = os.getenv("FLAGS_prim_all", "False") == "True"
             if use_prim:
-                print(f"✨ ✨ Prim = True, prim can be disabled by set 'FLAGS_prim_all=False'")
+                # print(f"✨ ✨ Prim = True, prim can be disabled by set 'FLAGS_prim_all=False'")
                 paddle.framework.core.set_prim_eager_enabled(True)
                 paddle.framework.core._set_prim_all_enabled(True)
-            else:
-                print(f"✨ ✨ Prim = False, prim can be disabled by set 'FLAGS_prim_all=False'")
+            # else:
+                # print(f"✨ ✨ Prim = False, prim can be disabled by set 'FLAGS_prim_all=False'")
 
             # Register all modulus groups before calling hydra main
             register_hydra_configs()

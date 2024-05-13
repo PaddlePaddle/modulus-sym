@@ -26,18 +26,6 @@ import paddle.nn.functional as F
 from paddle import Tensor
 from modulus.sym.manager import JitManager, JitArchMode
 
-# Use silu forward decomposition only when
-# 1) `FLAGS_use_cinn` is set to True, or
-# 2) `silu_comp` env variable is set to True.
-use_silu_forward_composite = os.getenv("silu_comp", "False") == "True"
-use_silu_forward_composite |= bool(os.getenv("FLAGS_use_cinn", "False") == "True")
-
-if use_silu_forward_composite:
-    silu_func = lambda x: x * F.sigmoid(x)
-    print(f"✨ ✨ Using silu(x) = x * sigmoid(x)")
-else:
-    silu_func = F.silu
-    print(f"✨ ✨ Using silu(x) = F.silu(x)")
 
 class ActivationMeta(enum.EnumMeta):
     def __getitem__(self, name):
@@ -80,6 +68,17 @@ def gelu(x: paddle.Tensor) -> paddle.Tensor:
     return 0.5 * x * (1.0 + paddle.tanh(x * 0.7978845608 * (1.0 + 0.044715 * x * x)))
     # return 0.5 * x * (1 + paddle.tanh(paddle.sqrt(2 / np.pi) * (x + 0.044715 * paddle.pow(x, 3))))
 
+
+# Use silu forward decomposition only when
+# 1) `FLAGS_use_cinn` is set to True, or
+# 2) `silu_comp` env variable is set to True.
+use_silu_forward_composite = os.getenv("silu_comp", "False").lower() == "true"
+use_silu_forward_composite |= bool(os.getenv("FLAGS_use_cinn", "False").lower() == "true")
+
+if use_silu_forward_composite:
+    silu_func = lambda x: x * F.sigmoid(x)
+else:
+    silu_func = F.silu
 
 def custom_silu(x: paddle.Tensor) -> paddle.Tensor:
     # return paddle.nn.functional.silu(x)

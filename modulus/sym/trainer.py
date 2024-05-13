@@ -467,18 +467,6 @@ class Trainer(AdamMixin, AdaHessianMixin, BFGSMixin):
             )
 
         # load network
-        self.initial_step = 0
-        for model in self.saveable_models:
-            try:
-                model.set_state_dict(
-                    paddle.load(f"./init_ckpt/{model.checkpoint_filename}")
-                )
-                self.log.info(f"✨ ✨ Loaded initial pytorch weight for {model.checkpoint_filename}")
-            except Exception as e:
-                self.log.info(f"✨ ✨ Skip load pytorch weight for \n{e}\n")
-
-        loss_monitor = bool(int(os.getenv("loss_monitor", False)))
-        loss_monitor_pytorch_paddle = bool(int(os.getenv("loss_monitor_pytorch_paddle", False)))
         self.initial_step = self.load_network()
 
         # make summary writer
@@ -555,6 +543,9 @@ class Trainer(AdamMixin, AdaHessianMixin, BFGSMixin):
                 paddle.framework.core.nvprof_nvtx_push("Training iteration")
 
                 if self.cfg.cuda_graphs:
+                    raise NotImplementedError(
+                        "CUDA-graphs are not supported for Modulus with Paddle backend."
+                    )
                     # NOTE: CUDA-graph is not supported yet
                     # If cuda graphs statically load it into defined allocations
                     self.load_data(static=True)
