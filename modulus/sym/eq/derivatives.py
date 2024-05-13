@@ -116,9 +116,9 @@ class Derivative(paddle.nn.Layer):
 
         evaluate = cls(bwd_derivative_dict)
         nvtx_str = evaluate.nvtx_str
-        if jit:
-            raise NotImplementedError("JIT is not implemented for Derivative")
-            evaluate = paddle.jit.to_static(evaluate)
+        # if jit:
+        #     raise NotImplementedError("JIT is not implemented for Derivative")
+        #     evaluate = paddle.jit.to_static(evaluate)
 
         derivative_node = Node(
             inputs,

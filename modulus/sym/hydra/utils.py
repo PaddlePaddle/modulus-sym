@@ -74,11 +74,11 @@ def main(config_path: str, config_name: str = "config"):
             # os.environ['PYTHONHASHSEED'] = str(GLOBAL_RANDOM_SEED)
 
             # Enable prim mode
-            use_prim = os.getenv("FLAGS_prim_all", "False") == "True"
-            if use_prim:
-                # print(f"✨ ✨ Prim = True, prim can be disabled by set 'FLAGS_prim_all=False'")
-                paddle.framework.core.set_prim_eager_enabled(True)
-                paddle.framework.core._set_prim_all_enabled(True)
+            # use_prim = os.getenv("FLAGS_prim_all", "False") == "True"
+            # if use_prim:
+            #     # print(f"✨ ✨ Prim = True, prim can be disabled by set 'FLAGS_prim_all=False'")
+            #     paddle.framework.core.set_prim_eager_enabled(True)
+            #     paddle.framework.core._set_prim_all_enabled(True)
             # else:
                 # print(f"✨ ✨ Prim = False, prim can be disabled by set 'FLAGS_prim_all=False'")
 

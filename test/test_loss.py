@@ -26,11 +26,11 @@ from modulus.sym.loss import (
 def test_loss_norm():
     # make pointwise test values
     invar = {
-        "x": paddle.arange(end=10)[:, None],
-        "area": paddle.ones(shape=[10])[:, None] / 10,
+        "x": paddle.arange(end=10, dtype="float32")[:, None],
+        "area": paddle.ones(shape=[10], dtype="float32")[:, None] / 10,
     }
-    pred_outvar = {"u": paddle.arange(end=10)[:, None]}
-    true_outvar = {"u": paddle.arange(end=10)[:, None] + 2}
+    pred_outvar = {"u": paddle.arange(end=10, dtype="float32")[:, None]}
+    true_outvar = {"u": paddle.arange(end=10, dtype="float32")[:, None] + 2}
     lambda_weighting = {"u": paddle.ones(shape=[10])[:, None]}
 
     # Test Pointwise l2
@@ -55,11 +55,11 @@ def test_loss_norm():
     # make Integral test values
     list_invar = [
         {
-            "x": paddle.arange(end=10)[:, None],
-            "area": paddle.ones(shape=[10])[:, None] / 10,
+            "x": paddle.arange(end=10, dtype="float32")[:, None],
+            "area": paddle.ones(shape=[10], dtype="float32")[:, None] / 10,
         }
     ]
-    list_pred_outvar = [{"u": paddle.arange(end=10)[:, None]}]
+    list_pred_outvar = [{"u": paddle.arange(end=10, dtype="float32")[:, None]}]
     list_true_outvar = [{"u": paddle.to_tensor(2.5)[None, None]}]
     list_lambda_weighting = [{"u": paddle.ones(shape=[1])[None, None]}]
 

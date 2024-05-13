@@ -142,7 +142,7 @@ class GaborFilter(nn.Layer):
             dtype=paddle.get_default_dtype(),
         )
         self.phase = self.create_parameter(
-            layer_size,
+            [layer_size],
             dtype=paddle.get_default_dtype(),
         )
         self.mu = self.create_parameter(

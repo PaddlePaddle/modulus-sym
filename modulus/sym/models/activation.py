@@ -180,7 +180,6 @@ def get_activation_fn(
     else:
         activation_fn = activation
 
-    if JitManager().enabled and JitManager().arch_mode == JitArchMode.ONLY_ACTIVATION:
-        raise NotImplementedError("JIT is not supported for activation functions")
-        activation_fn = paddle.jit.to_static(activation_fn)
+    # if JitManager().enabled and JitManager().arch_mode == JitArchMode.ONLY_ACTIVATION and JitManager().use_cinn:
+    #     activation_fn = paddle.jit.to_static(activation_fn)
     return activation_fn

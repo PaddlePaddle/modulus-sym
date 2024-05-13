@@ -113,10 +113,6 @@ class Constraint:
                 build_strategy=build_strategy,
                 full_graph=True,
             )(self.model.forward)
-        elif jit_manager.use_cinn:
-            raise RuntimeError(
-                f"Please set FLAGS_use_cinn=False as 'to_static' is set to False"
-            )
 
     @property
     def input_names(self) -> List[Key]:

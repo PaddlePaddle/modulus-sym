@@ -83,6 +83,7 @@ def test_multiscale_fourier_net():
     print("Success!")
 
 
+@pytest.mark.skip(reason="FuncArch requires forward-mode autodiff, which is not supported in paddle yet.")
 @pytest.mark.parametrize(
     "input_keys", [[Key("x"), Key("y")], [Key("x"), Key("y", scale=(1.0, 2.0))]]
 )

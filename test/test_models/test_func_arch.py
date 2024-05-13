@@ -27,6 +27,7 @@ device = str("cuda:0" if paddle.device.cuda.device_count() >= 1 else "cpu"
     ).replace("cuda", "gpu")
 
 
+@pytest.mark.skip(reason="FuncArch requires forward-mode autodiff, which is not supported in paddle yet.")
 @pytest.mark.parametrize("jit_activation", [True, False])
 def test_func_arch_graph_1(jit_activation):
     """
@@ -88,6 +89,7 @@ def test_func_arch_graph_1(jit_activation):
         assert paddle.allclose(ref_out[k], ft_out[k], atol=5e-5).item()
 
 
+@pytest.mark.skip(reason="FuncArch requires forward-mode autodiff, which is not supported in paddle yet.")
 @pytest.mark.parametrize("func_arch_allow_partial_hessian", [True, False])
 def test_func_arch_graph_2(func_arch_allow_partial_hessian):
     """

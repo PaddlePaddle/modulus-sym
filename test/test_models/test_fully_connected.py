@@ -81,6 +81,7 @@ def validate_func_arch_fully_connected(
     return ft_net
 
 
+@pytest.mark.skip(reason="FuncArch requires forward-mode autodiff, which is not supported in paddle yet.")
 @pytest.mark.parametrize(
     "input_keys",
     [

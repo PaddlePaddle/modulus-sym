@@ -80,11 +80,6 @@ class JitManager(object):
 
     @enabled.setter
     def enabled(self, flag):
-        if flag:
-            os.environ["to_staic"] = "True"
-        else:
-            os.environ["to_staic"] = "False"
-
         self._enabled = flag
 
     @property
@@ -96,9 +91,6 @@ class JitManager(object):
         self._use_cinn = flag
         if flag:
             logger.info("CINN is enabled in modulus-sym(paddle backend)")
-            os.environ["FLAGS_use_cinn"] = "True"
-        else:
-            os.environ["FLAGS_use_cinn"] = "False"
         backend = "CINN" if flag else None
         if self.enabled:
             logger.info(f"JIT using the {backend} backend")
@@ -112,9 +104,6 @@ class JitManager(object):
         self._use_prim = flag
         if flag:
             logger.info("Prim is enabled in modulus-sym(paddle backend)")
-            os.environ["FLAGS_prim_all"] = "True"
-        else:
-            os.environ["FLAGS_prim_all"] = "False"
         if self.enabled:
             if self.use_cinn and not self.use_prim:
                 logger.warning(

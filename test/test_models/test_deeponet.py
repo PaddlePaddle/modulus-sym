@@ -30,10 +30,10 @@ _ = paddle.seed(seed=0)
 device = str("cuda:0" if paddle.device.cuda.device_count() >= 1 else "cpu").replace(
     "cuda", "gpu"
 )
-# >>>torch.backends.cuda.matmul.allow_tf32 = False
 
 paddle.framework.core.set_prim_eager_enabled(True)
 
+@pytest.mark.skip(reason="FuncArch requires forward-mode autodiff, which is not supported in paddle yet.")
 @pytest.mark.parametrize(
     "branch_input_keys", [[Key("a", 100)], [Key("a", 100, scale=(1.0, 2.0))]]
 )
@@ -60,6 +60,7 @@ def test_func_arch_deeponet(branch_input_keys, validate_with_dict_forward, dim):
     validate_func_arch_net(ref_net, deriv_keys, validate_with_dict_forward)
 
 
+@pytest.mark.skip(reason="FuncArch requires forward-mode autodiff, which is not supported in paddle yet.")
 @pytest.mark.parametrize("validate_with_dict_forward", [True, False])
 def test_func_arch_deeponet_with_pix2pix(validate_with_dict_forward):
     """

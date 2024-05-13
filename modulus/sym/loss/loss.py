@@ -81,9 +81,8 @@ class PointwiseLossNorm(Loss):
         super().__init__()
         self.ord: int = ord
 
-    # @staticmethod
+    @staticmethod
     def _loss(
-        self,
         invar: Dict[str, Tensor],
         pred_outvar: Dict[str, Tensor],
         true_outvar: Dict[str, Tensor],
@@ -129,9 +128,8 @@ class IntegralLossNorm(Loss):
         super().__init__()
         self.ord: int = ord
 
-    # @staticmethod
+    @staticmethod
     def _loss(
-        self,
         list_invar: List[Dict[str, Tensor]],
         list_pred_outvar: List[Dict[str, Tensor]],
         list_true_outvar: List[Dict[str, Tensor]],
