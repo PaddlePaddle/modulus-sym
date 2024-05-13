@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.4.0a0] - 2024-01-XX
+## [1.6.0a0] - 2024-07-XX
 
 ### Added
 
@@ -18,11 +18,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix bug for `ConvFullyConnectedArch`.
-
 ### Security
 
 ### Dependencies
+
+## [1.5.0] - 2024-04-17
+
+### Added
+
+- Added reservoir examples using GenAI and CCUS workflows.
+
+### Security
+
+- Update OpenCV and Pillow versions to fix security
+
+## [1.4.0] - 2024-01-25
+
+### Fixed
+
+- Fix bug for `ConvFullyConnectedArch`.
+- Updating `Activation.SILU` test to conform with updated nvFuser kernel generation.
 
 ## [1.3.0] - 2023-11-20
 
@@ -42,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - Upgrade Pillow and Sympy to their latest versions.
+- Upgrade Scikit-Learn version.
 
 ### Dependencies
 
