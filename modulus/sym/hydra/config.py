@@ -50,7 +50,7 @@ class ModulusConfig:
     save_filetypes: str = "vtk"
     summary_histograms: bool = False
     jit: bool = False
-    jit_use_nvfuser: bool = False
+    jit_use_cinn: bool = False
     jit_arch_mode: str = "only_activation"
     jit_autograd_nodes: bool = False
 

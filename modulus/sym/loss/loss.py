@@ -77,10 +77,9 @@ class PointwiseLossNorm(Loss):
         Order of the loss. For example, `ord=2` would be the L2 loss.
     """
 
-    def __init__(self, ord: int = 2, name=""):
+    def __init__(self, ord: int = 2):
         super().__init__()
         self.ord: int = ord
-        self.name = name
 
     # @staticmethod
     def _loss(
@@ -97,8 +96,6 @@ class PointwiseLossNorm(Loss):
             l = lambda_weighting[key] * paddle.abs(
                 pred_outvar[key] - true_outvar[key]
             ).pow(ord)
-            # os.makedirs(self.name, exist_ok=True)
-            # np.save(os.path.join(self.name, key) + f"_{step}.npy", pred_outvar[key].numpy())
             if "area" in invar.keys():
                 l *= invar["area"]
             losses[key] = l.sum()
@@ -128,10 +125,9 @@ class IntegralLossNorm(Loss):
         Order of the loss. For example, `ord=2` would be the L2 loss.
     """
 
-    def __init__(self, ord: int = 2, name=""):
+    def __init__(self, ord: int = 2):
         super().__init__()
         self.ord: int = ord
-        self.name: str = name
 
     # @staticmethod
     def _loss(
@@ -292,12 +288,11 @@ class CausalLossNorm(Loss):
         Number of chunks splitting the temporal domain evenly.
     """
 
-    def __init__(self, ord: int = 2, eps: float = 1.0, n_chunks=10, name: str = ""):
+    def __init__(self, ord: int = 2, eps: float = 1.0, n_chunks=10):
         super().__init__()
         self.ord: int = ord
         self.eps: float = eps
         self.n_chunks: int = n_chunks
-        self.name = name
 
     @staticmethod
     def _loss(

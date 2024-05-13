@@ -104,7 +104,6 @@ class ContinuousPointwiseIterableDataset(IterableDataset):
         invar_fn: Callable,
         outvar_fn: Callable,
         lambda_weighting_fn: Callable = None,
-        name: str = None,
     ):
 
         self.invar_fn = invar_fn
@@ -118,26 +117,11 @@ class ContinuousPointwiseIterableDataset(IterableDataset):
 
         def iterable_function():
             while True:
-                import os
-                load_data_flag = os.getenv("load_data", "False") == "True"
-                if load_data_flag:
-                    if name:
-                        invar = np.load(f"contiguous_pointwise_data/{name}/invar_torch_{self.iter_step}.npz")
-                        outvar = np.load(f"contiguous_pointwise_data/{name}/outvar_torch_{self.iter_step}.npz")
-                        lambda_weighting = np.load(f"contiguous_pointwise_data/{name}/lambda_weighting_torch_{self.iter_step}.npz")
-                    else:
-                        invar = np.load(f"contiguous_pointwise_data/invar_torch_{self.iter_step}.npz")
-                        outvar = np.load(f"contiguous_pointwise_data/outvar_torch_{self.iter_step}.npz")
-                        lambda_weighting = np.load(f"contiguous_pointwise_data/lambda_weighting_torch_{self.iter_step}.npz")
-                    invar = Dataset._to_tensor_dict(invar)
-                    outvar = Dataset._to_tensor_dict(outvar)
-                    lambda_weighting = Dataset._to_tensor_dict(lambda_weighting)
-                else:
-                    invar = Dataset._to_tensor_dict(self.invar_fn())
-                    outvar = Dataset._to_tensor_dict(self.outvar_fn(invar))
-                    lambda_weighting = Dataset._to_tensor_dict(
-                        self.lambda_weighting_fn(invar, outvar)
-                    )
+                invar = Dataset._to_tensor_dict(self.invar_fn())
+                outvar = Dataset._to_tensor_dict(self.outvar_fn(invar))
+                lambda_weighting = Dataset._to_tensor_dict(
+                    self.lambda_weighting_fn(invar, outvar)
+                )
                 self.iter_step += 1
                 yield (invar, outvar, lambda_weighting)
 
@@ -317,29 +301,21 @@ class ContinuousIntegralIterableDataset(IterableDataset):
 
         def iterable_function():
             while True:
-                import os
-                load_data_flag = os.getenv("load_data", "False") == "True"
-                if load_data_flag:
-                    print("✨ ✨ load data for ContinuousIntegralIterableDataset")
-                    list_invar = [dict(np.load(f"./contiguous_integral_data/list_invar_torch_{self.iter_step}[{i}].npz")) for i in range(self.batch_size)]
-                    list_outvar = [dict(np.load(f"./contiguous_integral_data/list_outvar_torch_{self.iter_step}[{i}].npz")) for i in range(self.batch_size)]
-                    list_lambda_weighting = [dict(np.load(f"./contiguous_integral_data/list_lambda_weighting_torch_{self.iter_step}[{i}].npz")) for i in range(self.batch_size)]
-                else:
-                    list_invar = []
-                    list_outvar = []
-                    list_lambda_weighting = []
-                    for _ in range(self.batch_size):
-                        param_range = self.param_ranges_fn()
-                        list_invar.append(self.invar_fn(param_range))
-                        if (
-                            not param_range
-                        ):  # TODO this can be removed after a np_lambdify rewrite
-                            param_range = {"_": next(iter(list_invar[-1].values()))[0:1]}
+                list_invar = []
+                list_outvar = []
+                list_lambda_weighting = []
+                for _ in range(self.batch_size):
+                    param_range = self.param_ranges_fn()
+                    list_invar.append(self.invar_fn(param_range))
+                    if (
+                        not param_range
+                    ):  # TODO this can be removed after a np_lambdify rewrite
+                        param_range = {"_": next(iter(list_invar[-1].values()))[0:1]}
 
-                        list_outvar.append(self.outvar_fn(param_range))
-                        list_lambda_weighting.append(
-                            self.lambda_weighting_fn(param_range, list_outvar[-1])
-                        )
+                    list_outvar.append(self.outvar_fn(param_range))
+                    list_lambda_weighting.append(
+                        self.lambda_weighting_fn(param_range, list_outvar[-1])
+                    )
                 invar = Dataset._to_tensor_dict(_stack_list_numpy_dict(list_invar))
                 outvar = Dataset._to_tensor_dict(_stack_list_numpy_dict(list_outvar))
                 lambda_weighting = Dataset._to_tensor_dict(

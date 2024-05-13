@@ -51,45 +51,9 @@ from .hydra import (
     instantiate_agg,
     add_hydra_run_path,
 )
-import sys
 from .distributed.manager import DistributedManager
 
 from contextlib import ContextDecorator
-
-
-class PaddleProfiler(ContextDecorator):
-    """
-    Profiler list how many kinds of C++ API is called.
-    """
-    def __init__(self, scheduler=None):
-        super().__init__()
-        self.prof = profiler.Profiler(
-            targets=[profiler.ProfilerTarget.CPU, profiler.ProfilerTarget.GPU],
-            scheduler=scheduler,
-            on_trace_ready=profiler.export_chrome_tracing("./log"),
-        )
-
-    def __enter__(self):
-        self.prof.start()
-        return self
-
-    def step(self):
-        self.prof.step()
-
-    def __exit__(self, type, value, traceback):
-        self.prof.stop()
-
-        self.prof.summary(
-            sorted_by=profiler.SortedKeys.GPUTotal,
-            op_detail=False,
-            thread_sep=False,
-            time_unit="ms",
-            views=profiler.SummaryView.OperatorView,
-        )
-        print(
-            "[Warning] This profiler mainly for count how many kinds of C++ API is called. "
-            "It is recommend to exit after 1 step for it is enough to gather called C++ API information."
-        )
 
 
 class AdamMixin:
@@ -104,7 +68,6 @@ class AdamMixin:
         for agg_step in range(self.grad_agg_freq):
             with self.auto_cast_ctx:
                 paddle.framework.core.nvprof_nvtx_push("Loss computation")
-                # fwd_tic = time.perf_counter()
                 losses_minibatch = self.compute_losses(step)
                 paddle.framework.core.nvprof_nvtx_pop()
                 if self.grad_agg_freq > 1:
@@ -116,14 +79,11 @@ class AdamMixin:
                 loss_minibatch = aggregator(losses_minibatch, step)
                 paddle.framework.core.nvprof_nvtx_pop()
                 loss += loss_minibatch
-                # self.fwd_cost = time.perf_counter() - fwd_tic
             paddle.framework.core.nvprof_nvtx_push("Weight gradients")
-            # bwd_tic = time.perf_counter()
             if not self.enable_scaler:
                 loss_minibatch.backward()
             else:
                 self.scaler.scale(loss_minibatch).backward()
-            # self.bwd_cost = time.perf_counter() - bwd_tic
             paddle.framework.core.nvprof_nvtx_pop()
             losses.update(losses_minibatch)
 
@@ -517,24 +477,9 @@ class Trainer(AdamMixin, AdaHessianMixin, BFGSMixin):
             except Exception as e:
                 self.log.info(f"✨ ✨ Skip load pytorch weight for \n{e}\n")
 
-        debug_flag = bool(int(os.getenv("debug", False)))
         loss_monitor = bool(int(os.getenv("loss_monitor", False)))
         loss_monitor_pytorch_paddle = bool(int(os.getenv("loss_monitor_pytorch_paddle", False)))
-        if debug_flag:
-            self.log.info("✨ ✨ Skip load network as debug=1 in os.getenv")
-            self.initial_step = 0
-            if not loss_monitor:
-                for model in self.saveable_models:
-                    model.set_state_dict(
-                        paddle.load(f"./init_ckpt/{model.checkpoint_filename}")
-                    )
-            if loss_monitor_pytorch_paddle:
-                for model in self.saveable_models:
-                    model.set_state_dict(
-                        paddle.load(f"./init_ckpt/{model.checkpoint_filename}")
-                    )
-        else:
-            self.initial_step = self.load_network()
+        self.initial_step = self.load_network()
 
         # make summary writer
         self.writer = SummaryWriter(
@@ -580,8 +525,6 @@ class Trainer(AdamMixin, AdaHessianMixin, BFGSMixin):
             self.sigterm_handler = sigterm_handler
 
         # train loop
-        # with PaddleProfiler((10, 20)) as pd_prof:
-        self.log.info(f"Prim = {paddle.framework.core._is_eager_prim_enabled()}")
         with ExitStack() as stack:
             if self.profile:
                 raise NotImplementedError(
@@ -612,15 +555,14 @@ class Trainer(AdamMixin, AdaHessianMixin, BFGSMixin):
                 paddle.framework.core.nvprof_nvtx_push("Training iteration")
 
                 if self.cfg.cuda_graphs:
+                    # NOTE: CUDA-graph is not supported yet
                     # If cuda graphs statically load it into defined allocations
                     self.load_data(static=True)
 
                     loss, losses = self._cuda_graph_training_step(step)
                 else:
                     # Load all data for constraints
-                    # data_tic = time.perf_counter()
                     self.load_data()
-                    # data_cost = time.perf_counter() - data_tic
 
                     self.optimizer.clear_grad()
 
@@ -629,27 +571,19 @@ class Trainer(AdamMixin, AdaHessianMixin, BFGSMixin):
                         self.aggregator, self.global_optimizer_model, step
                     )
 
-                    # opt_tic = time.perf_counter()
                     # take optimizer step
                     self.apply_gradients()
-                    if step == 5:
-                        self.log.info(f"Mem = {paddle.device.cuda.max_memory_allocated() / (1<<30):.3f} GB")
 
-                    # opt_cost = time.perf_counter() - opt_tic
-
-                    # self.log.info(f"reader_cost: {data_cost:.3f} fwd_cost: {self.fwd_cost:.3f} bwd_cost: {self.bwd_cost:.3f} opt_cost: {opt_cost:.3f}")
                     # take scheduler step
                     if hasattr(self.scheduler, "step"):
                         self.scheduler.step()
 
                 # check for nans in loss
-                # if paddle.isnan(loss):
-                #     self.log.error("loss went to Nans")
-                #     break
+                if paddle.isnan(loss):
+                    self.log.error("loss went to Nans")
+                    break
 
                 self.step_str = f"[step: {step:10d}]"
-                if debug_flag:
-                    self.log.info(f"Step [{step}] Loss {loss.item():.10f} lr {self.optimizer.get_lr():.10f}")
 
                 # write train loss / learning rate tensorboard summaries
                 if step % self.summary_freq == 0:
@@ -690,30 +624,27 @@ class Trainer(AdamMixin, AdaHessianMixin, BFGSMixin):
                         barrier_flag = True
 
                 # write train / inference / validation datasets to tensorboard and file
-                # if step % self.cfg.training.rec_constraint_freq == 0:
-                #     barrier_flag = True
-                #     self._record_constraints()
+                if step % self.cfg.training.rec_constraint_freq == 0:
+                    barrier_flag = True
+                    self._record_constraints()
 
                 if (step % self.cfg.training.rec_validation_freq == 0) and (
                     self.has_validators
                 ):
-                    if not debug_flag:
-                        barrier_flag = True
-                        self._record_validators(step)
+                    barrier_flag = True
+                    self._record_validators(step)
 
                 if (step % self.cfg.training.rec_inference_freq == 0) and (
                     self.has_inferencers
                 ):
-                    if not debug_flag:
-                        barrier_flag = True
-                        self._record_inferencers(step)
+                    barrier_flag = True
+                    self._record_inferencers(step)
 
                 if (step % self.cfg.training.rec_monitor_freq == 0) and (
                     self.has_monitors
                 ):
-                    if not debug_flag:
-                        barrier_flag = True
-                        self._record_monitors(step)
+                    barrier_flag = True
+                    self._record_monitors(step)
 
                 # save checkpoint
                 if step % self.save_network_freq == 0:
@@ -726,15 +657,10 @@ class Trainer(AdamMixin, AdaHessianMixin, BFGSMixin):
                         else 0
                     )
                     if data_parallel_rank == 0:
-                        if not debug_flag:
-                            self.save_checkpoint(step)
-                            self.log.info(
-                                f"{self.step_str} saved checkpoint to {add_hydra_run_path(self.network_dir)}"
-                            )
-                        else:
-                            self.log.info(
-                                f"Skip save checkpoint for debug=1"
-                            )
+                        self.save_checkpoint(step)
+                        self.log.info(
+                            f"{self.step_str} saved checkpoint to {add_hydra_run_path(self.network_dir)}"
+                        )
 
                     if self.manager.distributed:
                         barrier_flag = True
@@ -767,7 +693,7 @@ class Trainer(AdamMixin, AdaHessianMixin, BFGSMixin):
                     # print statement
                     print_statement = (
                         # f'{self.step_str} loss: {float(loss):.10f}'
-                        f"{self.step_str} lr: {self.optimizer.get_lr():.10f}, loss: {float(loss):.10f}"
+                        f"{self.step_str} lr: {self.optimizer.get_lr():.10.3e}, loss: {float(loss):.10.3e}"
                     )
                     eta_sec = (self.max_steps - step) * (elapsed_time / self.print_stats_freq) / 1000
                     eta_str = str(datetime.timedelta(seconds=int(eta_sec)))
@@ -799,10 +725,6 @@ class Trainer(AdamMixin, AdaHessianMixin, BFGSMixin):
                     break
 
                 paddle.framework.core.nvprof_nvtx_pop()
-                    # pd_prof.step()
-            if debug_flag:
-                self.log.info("✨ ✨ Training is finished, now exit when debug_flag is enabled.")
-                sys.exit(0)
 
     def _cuda_graph_training_step(self, step: int):
         raise NotImplementedError("CUDA graph training is not implemented yet")

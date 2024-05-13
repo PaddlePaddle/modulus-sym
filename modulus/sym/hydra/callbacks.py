@@ -47,7 +47,7 @@ class ModulusCallback(Callback):
         jit_manager.init(
             config.jit,
             config.jit_arch_mode,
-            config.jit_use_nvfuser,
+            config.jit_use_cinn,
             config.jit_autograd_nodes,
         )
 

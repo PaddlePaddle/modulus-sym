@@ -32,6 +32,7 @@ from typing import Union, List
 from modulus.sym.node import Node
 from modulus.sym.constants import tf_dt
 from modulus.sym.distributed.manager import DistributedManager
+from modulus.sym.manager import JitManager
 from modulus.sym.dataset import Dataset, IterableDataset, DictImportanceSampledPointwiseIterableDataset
 from modulus.sym.loss import Loss
 from modulus.sym.graph import Graph
@@ -102,21 +103,20 @@ class Constraint:
         self._loss = loss
 
         # enable dy2st
-        import os
-        enable_jit = bool(os.getenv("to_static", "True") == "True") # Jit is enabled by default
-        enable_cinn = bool(os.getenv("FLAGS_use_cinn", "False") == "True") # CINN is disabled by default
-        if enable_jit:
+        jit_manager = JitManager()
+        if jit_manager.enabled:
             from paddle import jit
             from paddle import static
             build_strategy = static.BuildStrategy()
-            build_strategy.build_cinn_pass = enable_cinn
-            self.model.forward = jit.to_static(full_graph=True, build_strategy=build_strategy)(self.model.forward)
-            logger.info(f"🍰 🍰 Using jit.to_static with FLAGS_use_cinn={enable_cinn} in Constraint.__init__ in {__file__}, to_static can be disabled by set 'to_static=False python example.py'")
-        elif enable_cinn:
+            build_strategy.build_cinn_pass = jit_manager.use_cinn
+            self.model.forward = jit.to_static(
+                build_strategy=build_strategy,
+                full_graph=True,
+            )(self.model.forward)
+        elif jit_manager.use_cinn:
             raise RuntimeError(
-                f"Please set FLAGS_use_cinn=0 when 'to_static' is set to 0"
+                f"Please set FLAGS_use_cinn=False as 'to_static' is set to False"
             )
-
 
     @property
     def input_names(self) -> List[Key]:
@@ -171,11 +171,6 @@ class Constraint:
         assert isinstance(dataset, Dataset) or isinstance(
             dataset, IterableDataset
         ), "error, dataset must be a subclass of Dataset or IterableDataset"
-        debug_flag = bool(int(os.getenv("debug", False)))
-        if debug_flag:
-            shuffle = False
-            num_workers = 0
-            logger.info("Set shuffle to False and num_workers=0, as debug=1 in os.getenv")
 
         manager = DistributedManager()
 
@@ -232,35 +227,32 @@ class Constraint:
 
         # iterable-style
         elif isinstance(dataset, IterableDataset):
-            if debug_flag:
-                dataloader = dataset
+            if isinstance(dataset, DictImportanceSampledPointwiseIterableDataset):
+                # NOTE: Do not wrap DictImportanceSampledPointwiseIterableDataset
+                # for CUDA operation is not supported in current paddle's DataLoader
+                # dataloader = dataset
+                if num_workers > 0:
+                    raise RuntimeError(
+                        f"num_workers({num_workers}) > 0 may cause CUDA error for CUDA"
+                        " operation is not supported in current paddle's DataLoader."
+                        " Please set num_workers=0 to avoid this error."
+                    )
+                dataloader = DataLoader(
+                    dataset,
+                    batch_size=None,
+                    num_workers=num_workers,
+                    worker_init_fn=dataset.worker_init_fn,
+                    # persistent_workers=persistent_workers,
+                )
             else:
-                if isinstance(dataset, DictImportanceSampledPointwiseIterableDataset):
-                    # do not wrap with DataLoader for CUDA computation is not supported in
-                    # current paddle's DataLoader
-                    # dataloader = dataset
-                    if num_workers > 0:
-                        logger.warning(
-                            f"num_workers({num_workers}) > 0 may cause CUDA error for CUDA"
-                            " operation is not supported in current paddle's DataLoader."
-                            " Please set num_workers=0 to avoid this error."
-                        )
-                    dataloader = DataLoader(
-                        dataset,
-                        batch_size=None,
-                        num_workers=num_workers,
-                        worker_init_fn=dataset.worker_init_fn,
-                        # persistent_workers=persistent_workers,
-                    )
-                else:
-                    # for iterable datasets, must do batching/sampling within dataset
-                    dataloader = DataLoader(
-                        dataset,
-                        batch_size=None,
-                        num_workers=num_workers,
-                        worker_init_fn=dataset.worker_init_fn,
-                        persistent_workers=persistent_workers,
-                    )
+                # for iterable datasets, must do batching/sampling within dataset
+                dataloader = DataLoader(
+                    dataset,
+                    batch_size=None,
+                    num_workers=num_workers,
+                    worker_init_fn=dataset.worker_init_fn,
+                    persistent_workers=persistent_workers,
+                )
 
         # make dataloader infinite
         if infinite:

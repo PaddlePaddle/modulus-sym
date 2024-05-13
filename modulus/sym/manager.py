@@ -17,6 +17,7 @@
 """ Modulus Managers
 """
 
+import os
 import logging
 from typing import Dict, List, Union
 from enum import Enum
@@ -42,11 +43,15 @@ class JitManager(object):
 
         # Set the defaults
         if not hasattr(obj, "_enabled"):
-            obj._enabled = False
+            obj._enabled = (
+                paddle.__version__ == "0.0.0"
+            ) and bool(os.getenv("to_static", "True").lower() == "true")
         if not hasattr(obj, "_arch_mode"):
             obj._arch_mode = JitArchMode.ONLY_ACTIVATION
-        if not hasattr(obj, "_use_nvfuser"):
-            obj._use_nvfuser = True
+        if not hasattr(obj, "_use_cinn"):
+            obj._use_cinn = True
+        if not hasattr(obj, "_use_prim"):
+            obj._use_prim = False
         if not hasattr(obj, "_autograd_nodes"):
             obj._autograd_nodes = False
 
@@ -74,26 +79,45 @@ class JitManager(object):
     @enabled.setter
     def enabled(self, flag):
         if flag:
-            raise NotImplementedError(
-                "JIT is not supported in Modulus(paddle backend) yet"
-            )
-        # enable fusing single node and prevent tiny autodiff graph are inlined/reverted
+            os.environ["to_staic"] = "True"
+        else:
+            os.environ["to_staic"] = "False"
+
         self._enabled = flag
 
     @property
-    def use_nvfuser(self):
-        return self._use_nvfuser
+    def use_cinn(self):
+        return self._use_cinn
 
-    @use_nvfuser.setter
-    def use_nvfuser(self, flag):
-        self._use_nvfuser = flag
+    @use_cinn.setter
+    def use_cinn(self, flag):
+        self._use_cinn = flag
         if flag:
-            raise NotImplementedError(
-                "NVFuser is not supported in Modulus(paddle backend) yet"
-            )
-        backend = "NVFuser" if flag else "NNC"
+            logger.info("CINN is enabled in modulus-sym(paddle backend)")
+            os.environ["FLAGS_use_cinn"] = "True"
+        else:
+            os.environ["FLAGS_use_cinn"] = "False"
+        backend = "CINN" if flag else None
         if self.enabled:
-            logger.info(f"JIT using the {backend} TorchScript backend")
+            logger.info(f"JIT using the {backend} backend")
+
+    @property
+    def use_prim(self):
+        return self._use_prim
+
+    @use_prim.setter
+    def use_prim(self, flag):
+        self._use_prim = flag
+        if flag:
+            logger.info("Prim is enabled in modulus-sym(paddle backend)")
+            os.environ["FLAGS_prim_all"] = "True"
+        else:
+            os.environ["FLAGS_prim_all"] = "False"
+        if self.enabled:
+            if self.use_cinn and not self.use_prim:
+                logger.warning(
+                    f"Please set FLAGS_prim_all=True when CINN is enabled"
+                )
 
     @property
     def autograd_nodes(self):
@@ -106,10 +130,10 @@ class JitManager(object):
     def __repr__(self):
         return f"JitManager: {self._shared_state}"
 
-    def init(self, enabled, arch_mode, use_nvfuser, autograd_nodes):
+    def init(self, enabled, arch_mode, use_cinn, autograd_nodes):
         self.enabled = enabled
         self.arch_mode = arch_mode
-        self.use_nvfuser = use_nvfuser
+        self.use_cinn = use_cinn
         self.autograd_nodes = autograd_nodes
 
 
