@@ -25,15 +25,16 @@ def dx(inpt, dx, channel, dim, order=1, padding="zeros"):
 
     # get filter
     if order == 1:
-        ddx1D = paddle.Tensor(
+        ddx1D = paddle.to_tensor(
             [
                 -0.5,
                 0.0,
                 0.5,
-            ]
-        ).to(inpt.device)
+            ],
+            place=inpt.place,
+        )
     elif order == 3:
-        ddx1D = paddle.Tensor(
+        ddx1D = paddle.to_tensor(
             [
                 -1.0 / 60.0,
                 3.0 / 20.0,
@@ -42,8 +43,9 @@ def dx(inpt, dx, channel, dim, order=1, padding="zeros"):
                 3.0 / 4.0,
                 -3.0 / 20.0,
                 1.0 / 60.0,
-            ]
-        ).to(inpt.device)
+            ],
+            place=inpt.place,
+        )
     ddx3D = paddle.reshape(ddx1D, shape=[1, 1] + dim * [1] + [-1] + (1 - dim) * [1])
 
     # apply convolution
@@ -51,8 +53,10 @@ def dx(inpt, dx, channel, dim, order=1, padding="zeros"):
         var = F.pad(var, 4 * [(ddx1D.shape[0] - 1) // 2], "constant", 0)
     elif padding == "replication":
         var = F.pad(var, 4 * [(ddx1D.shape[0] - 1) // 2], "replicate")
+
     output = F.conv2d(var, ddx3D, padding="valid")
     output = (1.0 / dx) * output
+
     if dim == 0:
         output = output[:, :, :, (ddx1D.shape[0] - 1) // 2 : -(ddx1D.shape[0] - 1) // 2]
     elif dim == 1:
@@ -68,15 +72,16 @@ def ddx(inpt, dx, channel, dim, order=1, padding="zeros"):
 
     # get filter
     if order == 1:
-        ddx1D = paddle.Tensor(
+        ddx1D = paddle.to_tensor(
             [
                 1.0,
                 -2.0,
                 1.0,
-            ]
-        ).to(inpt.device)
+            ],
+            place=inpt.place
+        )
     elif order == 3:
-        ddx1D = paddle.Tensor(
+        ddx1D = paddle.to_tensor(
             [
                 1.0 / 90.0,
                 -3.0 / 20.0,
@@ -85,8 +90,9 @@ def ddx(inpt, dx, channel, dim, order=1, padding="zeros"):
                 3.0 / 2.0,
                 -3.0 / 20.0,
                 1.0 / 90.0,
-            ]
-        ).to(inpt.device)
+            ],
+            place=inpt.place
+        )
     ddx3D = paddle.reshape(ddx1D, shape=[1, 1] + dim * [1] + [-1] + (1 - dim) * [1])
 
     # apply convolution
@@ -94,8 +100,10 @@ def ddx(inpt, dx, channel, dim, order=1, padding="zeros"):
         var = F.pad(var, 4 * [(ddx1D.shape[0] - 1) // 2], "constant", 0)
     elif padding == "replication":
         var = F.pad(var, 4 * [(ddx1D.shape[0] - 1) // 2], "replicate")
+
     output = F.conv2d(var, ddx3D, padding="valid")
     output = (1.0 / dx**2) * output
+
     if dim == 0:
         output = output[:, :, :, (ddx1D.shape[0] - 1) // 2 : -(ddx1D.shape[0] - 1) // 2]
     elif dim == 1:
