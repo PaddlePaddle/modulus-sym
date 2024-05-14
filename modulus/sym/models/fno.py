@@ -298,13 +298,13 @@ class FNO3DEncoder(nn.Layer):
 def grid_to_points1d(vars_dict: Dict[str, Tensor]):
     for var, value in vars_dict.items():
         value = paddle.transpose(value, (0, 2, 1))
-        vars_dict[var] = value.reshape(-1, value.shape[-1])
+        vars_dict[var] = value.reshape([-1, value.shape[-1]])
     return vars_dict
 
 
 def points_to_grid1d(vars_dict: Dict[str, Tensor], shape: List[int]):
     for var, value in vars_dict.items():
-        value = value.reshape(shape[0], shape[2], value.shape[-1])
+        value = value.reshape([shape[0], shape[2], value.shape[-1]])
         vars_dict[var] = paddle.transpose(value, (0, 2, 1))
     return vars_dict
 
@@ -312,13 +312,13 @@ def points_to_grid1d(vars_dict: Dict[str, Tensor], shape: List[int]):
 def grid_to_points2d(vars_dict: Dict[str, Tensor]):
     for var, value in vars_dict.items():
         value = paddle.transpose(value, (0, 2, 3, 1))
-        vars_dict[var] = value.reshape(-1, value.shape[-1])
+        vars_dict[var] = value.reshape([-1, value.shape[-1]])
     return vars_dict
 
 
 def points_to_grid2d(vars_dict: Dict[str, Tensor], shape: List[int]):
     for var, value in vars_dict.items():
-        value = value.reshape(shape[0], shape[2], shape[3], value.shape[-1])
+        value = value.reshape([shape[0], shape[2], shape[3], value.shape[-1]])
         vars_dict[var] = paddle.transpose(value, (0, 3, 1, 2))
     return vars_dict
 
@@ -326,13 +326,13 @@ def points_to_grid2d(vars_dict: Dict[str, Tensor], shape: List[int]):
 def grid_to_points3d(vars_dict: Dict[str, Tensor]):
     for var, value in vars_dict.items():
         value = paddle.transpose(value, (0, 2, 3, 4, 1))
-        vars_dict[var] = value.reshape(-1, value.shape[-1])
+        vars_dict[var] = value.reshape([-1, value.shape[-1]])
     return vars_dict
 
 
 def points_to_grid3d(vars_dict: Dict[str, Tensor], shape: List[int]):
     for var, value in vars_dict.items():
-        value = value.reshape(shape[0], shape[2], shape[3], shape[4], value.shape[-1])
+        value = value.reshape([shape[0], shape[2], shape[3], shape[4], value.shape[-1]])
         vars_dict[var] = paddle.transpose(value, (0, 4, 1, 2, 3))
     return vars_dict
 

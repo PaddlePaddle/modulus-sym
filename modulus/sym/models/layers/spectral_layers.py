@@ -104,15 +104,9 @@ class SpectralConv2d(nn.Layer):
         self.scale = 1 / (in_channels * out_channels)
         self.weights1 = self.create_parameter(
             [in_channels, out_channels, self.modes1, self.modes2, 2],
-            default_initializer=nn.initializer.Assign(
-                paddle.empty([in_channels, out_channels, self.modes1, self.modes2, 2])
-            ),
         )
         self.weights2 = self.create_parameter(
             [in_channels, out_channels, self.modes1, self.modes2, 2],
-            default_initializer=nn.initializer.Assign(
-                paddle.empty([in_channels, out_channels, self.modes1, self.modes2, 2])
-            ),
         )
         self.reset_parameters()
 
@@ -161,8 +155,8 @@ class SpectralConv2d(nn.Layer):
         return x
 
     def reset_parameters(self):
-        self.weights1.data = self.scale * paddle.rand(self.weights1.data.shape)
-        self.weights2.data = self.scale * paddle.rand(self.weights2.data.shape)
+        paddle.assign(self.weights1, self.scale * paddle.rand(self.weights1.shape))
+        paddle.assign(self.weights2, self.scale * paddle.rand(self.weights2.shape))
 
 
 class SpectralConv3d(nn.Layer):
