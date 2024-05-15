@@ -111,6 +111,15 @@ docker build -t modulus-sym:deploy \
 
 Currently only `linux/amd64` and `linux/arm64` platforms are supported.
 
+## Quickly run
+
+Quickly run a simple exmaple: `ldc_2d.py` with script below.
+
+``` sh
+cd ./examples/ldc/
+python ldc_2d.py
+```
+
 ## Contributing
 
 For guidance on making a contribution to Modulus, see the [contributing guidelines](https://github.com/NVIDIA/modulus-sym/blob/main/CONTRIBUTING.md).
