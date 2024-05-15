@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import paddle
 from functools import partial
 from re import S
 import numpy as np
@@ -231,7 +230,7 @@ class AFNO2D(nn.Layer):
         x = paddle.as_real(x=x)
         o2 = paddle.zeros(shape=x.shape)
 
-        o1 = nn.functional.relu(
+        o1 = F.relu(
             x=compl_mul_add_act(
                 x[
                     :,
@@ -248,7 +247,7 @@ class AFNO2D(nn.Layer):
         ] = compl_mul_add_act(o1, self.w2, self.b2)
 
         # finalize
-        x = nn.functional.softshrink(x=o2, threshold=self.sparsity_threshold)
+        x = F.softshrink(x=o2, threshold=self.sparsity_threshold)
         x = paddle.as_complex(x=x)
         x = x.reshape(B, H, W // 2 + 1, C)
         x = paddle.fft.irfft2(x=x, s=(H, W), axes=(1, 2), norm="ortho")

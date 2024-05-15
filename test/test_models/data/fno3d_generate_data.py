@@ -14,15 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import paddle
 import numpy as np
-import operator
-from functools import reduce
-from functools import partial
+import paddle
+import paddle.nn as nn
+import paddle.nn.functional as F
+
 
 paddle.seed(seed=0)
 np.random.seed(0)
 cuda_device = str("cpu").replace("cuda", "gpu")
+
+
+################################################################
+# 3d fourier neural operator
+# Based on: https://github.com/zongyi-li/fourier_neural_operator/blob/master/fourier_3d.py
+################################################################
+
 
 
 class SpectralConv3d(nn.Layer):
@@ -304,26 +311,26 @@ class FNO3d(nn.Layer):
         x = paddle.concat(x=(x, grid), axis=-1)
         x = self.fc0(x)
         x = x.transpose(perm=[0, 4, 1, 2, 3])
-        x = nn.functional.pad(x, [0, self.padding])
+        x = F.pad(x, [0, self.padding])
         x1 = self.conv0(x)
         x2 = self.w0(x)
         x = x1 + x2
-        x = nn.functional.gelu(x=x)
+        x = F.gelu(x=x)
         x1 = self.conv1(x)
         x2 = self.w1(x)
         x = x1 + x2
-        x = nn.functional.gelu(x=x)
+        x = F.gelu(x=x)
         x1 = self.conv2(x)
         x2 = self.w2(x)
         x = x1 + x2
-        x = nn.functional.gelu(x=x)
+        x = F.gelu(x=x)
         x1 = self.conv3(x)
         x2 = self.w3(x)
         x = x1 + x2
         x = x[..., : -self.padding]
         x = x.transpose(perm=[0, 2, 3, 4, 1])
         x = self.fc1(x)
-        x = nn.functional.gelu(x=x)
+        x = F.gelu(x=x)
         x = self.fc2(x)
         return x
 
