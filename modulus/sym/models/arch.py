@@ -28,7 +28,6 @@ from modulus.sym.constants import NO_OP_SCALE
 from modulus.sym.key import Key
 from modulus.sym.node import Node
 
-# from modulus.sym.constants import JIT_PYTORCH_VERSION
 from modulus.sym.distributed import DistributedManager
 from modulus.sym.manager import JitManager, JitArchMode
 from modulus.sym.models.activation import Activation
@@ -91,7 +90,7 @@ class Arch(nn.Layer):
 
         self.var_dim = -1
 
-        # If no detach keys, add a dummy for TorchScript compilation
+        # If no detach keys, add a dummy for PaddleJIT compilation
         if not self.detach_key_dict:
             dummy_str = "_"
             while dummy_str in self.input_key_dict:
@@ -142,8 +141,7 @@ class Arch(nn.Layer):
         self.checkpoint_filename = name + f".{model_parallel_rank}.pdparams"
 
         if jit:
-            raise NotImplementedError("jit is not supported in paddle backend now")
-            logger.warning(
+            raise NotImplementedError(
                 "Passing jit=true when constructing Arch Node is deprecated, "
                 "please remove it as JITManager could automatically handel it."
             )

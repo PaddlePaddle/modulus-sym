@@ -66,7 +66,6 @@ class SpectralConv1d(nn.Layer):
     def forward(self, x: Tensor) -> Tensor:
         bsize = x.shape[0]
         # Compute Fourier coeffcients up to factor of e^(- something constant)
-        # print("SpectralConv1d")
         x_ft = paddle.fft.rfft(x)
 
         # Multiply relevant Fourier modes
@@ -132,7 +131,6 @@ class SpectralConv2d(nn.Layer):
     def forward(self, x: Tensor) -> Tensor:
         batchsize = x.shape[0]
         # Compute Fourier coeffcients up to factor of e^(- something constant)
-        # print("SpectralConv2d")
         x_ft = paddle.fft.rfft2(x)
 
         # Multiply relevant Fourier modes
@@ -257,7 +255,6 @@ class SpectralConv3d(nn.Layer):
 
     def forward(self, x: Tensor) -> Tensor:
         batchsize = x.shape[0]
-        # print("SpectralConv3d")
         x_ft = paddle.fft.rfftn(x, axes=[-3, -2, -1])
         out_ft = paddle.zeros(
             [
@@ -295,7 +292,6 @@ class SpectralConv3d(nn.Layer):
 # Utils for PINO exact gradients
 # ==========================================
 def fourier_derivatives(x: Tensor, l: List[float]) -> Tuple[Tensor, Tensor]:
-    # print("fourier_derivatives")
     # check that input shape maches domain length
     assert len(x.shape) - 2 == len(l), "input shape doesn't match domain dims"
 
@@ -398,7 +394,6 @@ def first_order_pino_grads(
     weights_2: Tensor,
     bias_1: Tensor,
 ) -> Tuple[Tensor]:
-    # print("first_order_pino_grads")
     # dim for einsum
     dim = len(u.shape) - 2
     dim_str = "xyz"[:dim]
@@ -420,10 +415,6 @@ def first_order_pino_grads(
     diff_tanh = 1 / paddle.cosh(u_hidden) ** 2
 
     # compute diff(f(g))
-    # print("mi" + dim_str + ",bm" + dim_str + ",km" + dim_str + "->bi" + dim_str)
-    # print(f"weights_1.shape = {weights_1.shape}") # [32, 32, 1, 1]
-    # print(f"diff_tanh.shape = {diff_tanh.shape}") # [8, 32, 241, 241]
-    # print(f"weights_2.shape = {weights_2.shape}") # [1, 32, 1, 1]
     b, i, k, m, x, y = (
         diff_tanh.shape[0], # b
         weights_1.shape[1], # i
@@ -437,9 +428,6 @@ def first_order_pino_grads(
     weights_2_tmp = paddle.broadcast_to(weights_2.unsqueeze(0).unsqueeze(0), [b, i, k, m, x, y])
 
     diff_fg = (weights_1_tmp * diff_tanh_tmp * weights_2_tmp).sum(axis=(2, 3))
-    # print(diff_fg.shape)
-    # print(torch.allclose(z, diff_fg))
-
     # diff_fg = paddle.einsum(
     #     "mi" + dim_str + ",bm" + dim_str + ",km" + dim_str + "->bi" + dim_str,
     #     weights_1,
@@ -452,7 +440,6 @@ def first_order_pino_grads(
         t = (A * B).sum(1)
         return t
 
-    # print("4 bi" + dim_str + ",bi" + dim_str + "->b" + dim_str, diff_fg.shape, ux[0].shape)
     vx = [
         einsum_bixy_bixy(diff_fg, w)
         # paddle.einsum("bi" + dim_str + ",bi" + dim_str + "->b" + dim_str, diff_fg, w)
@@ -470,7 +457,6 @@ def second_order_pino_grads(
     weights_2: Tensor,
     bias_1: Tensor,
 ) -> Tuple[Tensor]:
-    # print("second_order_pino_grads")
     # dim for einsum
     dim = len(u.shape) - 2
     dim_str = "xyz"[:dim]
@@ -492,10 +478,6 @@ def second_order_pino_grads(
     diff_tanh = 1 / paddle.cosh(u_hidden) ** 2
 
     # compute diff(f(g))
-    # print("1 pattern = ", "mi" + dim_str + ",bm" + dim_str + ",km" + dim_str + "->bi" + dim_str)
-    # print(weights_1.shape)
-    # print(diff_tanh.shape)
-    # print(weights_2.shape)
     b, i, k, m, x, y = (
         diff_tanh.shape[0], # b
         weights_1.shape[1], # i
@@ -521,24 +503,6 @@ def second_order_pino_grads(
     diff_diff_tanh = -2 * diff_tanh * paddle.tanh(u_hidden)
 
     # compute diff(g) * hessian(f) * diff(g)
-    # print("bi"
-    #         + dim_str
-    #         + ",mi"
-    #         + dim_str
-    #         + ",bm"
-    #         + dim_str
-    #         + ",mj"
-    #         + dim_str
-    #         + ",bj"
-    #         + dim_str
-    #         + "->b"
-    #         + dim_str)
-    # print([w.shape for w in ux])
-    # print((weights_1).shape)
-    # print((weights_2 * diff_diff_tanh).shape)
-    # print((weights_1).shape)
-    # print([w.shape for w in ux])
-    # exit()
     # def einsum_vxx1_item(a, b, c, d, e):
     #     b, i, x, y = a.shape
     #     m = d.shape[0]
@@ -585,6 +549,5 @@ def second_order_pino_grads(
         # paddle.einsum("bi" + dim_str + ",bi" + dim_str + "->b" + dim_str, diff_fg, w)
         for w in uxx
     ]
-    # print("3 bi" + dim_str + ",bi" + dim_str + "->b" + dim_str)
     vxx = [paddle.unsqueeze(a + b, axis=1) for a, b in zip(vxx1, vxx2)]
     return vxx

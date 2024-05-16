@@ -15,4 +15,4 @@
 # limitations under the License.
 
 from .numpy_printer import np_lambdify
-from .paddle_printer import paddle_lambdify, SympyToTorch
+from .paddle_printer import paddle_lambdify, SympyToPaddle

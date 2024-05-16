@@ -32,8 +32,8 @@ class Node:
         Names of inputs to node. For example, `inputs=['x', 'y']`.
     outputs : List[Union[str, Key]]
         Names of outputs to node. For example, `inputs=['u', 'v', 'p']`.
-    evaluate : Pytorch Function
-        A pytorch function that takes in a dictionary of tensors whose keys are the above `inputs`.
+    evaluate : Paddle Function
+        A paddle function that takes in a dictionary of tensors whose keys are the above `inputs`.
     name : str
         Name of node for print statements and debugging.
     optimize : bool
@@ -87,7 +87,7 @@ class Node:
         from modulus.sym.utils.sympy.paddle_printer import (
             paddle_lambdify,
             _subs_derivatives,
-            SympyToTorch,
+            SympyToPaddle,
         )
 
         # sub all functions and derivatives with symbols
@@ -106,7 +106,7 @@ class Node:
             print("Verify before proceeding!")
         else:
             pass
-        evaluate = SympyToTorch(sub_eq, out_name, freeze_terms, detach_names)
+        evaluate = SympyToPaddle(sub_eq, out_name, freeze_terms, detach_names)
         inputs = Key.convert_list(evaluate.keys)
         outputs = Key.convert_list([out_name])
         node = cls(inputs, outputs, evaluate, name="Sympy Node: " + out_name)

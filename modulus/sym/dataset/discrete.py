@@ -130,7 +130,7 @@ class HDF5GridDataset(Dataset):
     def worker_init_fn(self, iworker):
         super().worker_init_fn(iworker)
         # open file on worker thread
-        # note each torch DataLoader worker process should open file individually when reading
+        # note each paddle DataLoader worker process should open file individually when reading
         # do not share open file descriptors across separate workers!
         # note files are closed when worker process is destroyed so no need to explicitly close
         self.f = h5py.File(self.path, "r")

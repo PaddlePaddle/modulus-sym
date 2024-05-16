@@ -39,8 +39,8 @@ class PointwiseMonitor(Monitor):
     output_names : List[str]
         List of outputs needed for metric.
     metrics : Dict[str, Callable]
-        Dictionary of pytorch functions whose input is a dictionary
-        torch tensors whose keys are the `output_names`. The keys
+        Dictionary of paddle functions whose input is a dictionary
+        paddle tensors whose keys are the `output_names`. The keys
         to `metrics` will be used to label the metrics in tensorboard/csv outputs.
     nodes : List[Node]
         List of Modulus Nodes to unroll graph with.

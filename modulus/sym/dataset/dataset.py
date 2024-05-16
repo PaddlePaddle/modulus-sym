@@ -30,7 +30,7 @@ class _BaseDataset:
     "Defines common requirements across map- and iterable- style datasets"
 
     def worker_init_fn(self, iworker):
-        "Called by each worker in torch dataloader when it initialises"
+        "Called by each worker in paddle dataloader when it initialises"
 
         # get the distributed manager object
         manager = DistributedManager()
@@ -61,7 +61,7 @@ class _BaseDataset:
     @staticmethod
     def _to_tensor_dict(var_dict, device=None):
 
-        # convert to torch
+        # convert to paddle
         tensor_dict = {
             key: paddle.to_tensor(value, dtype=tf_dt, place=device, stop_gradient=False)
             for key, value in var_dict.items()

@@ -101,9 +101,9 @@ class Identity(nn.Layer):
     Example
     -------
     >>> idnt_func = modulus.models.layers.Identity()
-    >>> input = torch.randn(2, 2)
+    >>> input = paddle.randn([2, 2])
     >>> output = idnt_func(input)
-    >>> torch.allclose(input, output)
+    >>> paddle.allclose(input, output).item()
     True
     """
 

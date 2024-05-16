@@ -35,7 +35,6 @@ from modulus.sym.models.fully_connected import ConvFullyConnectedArch
 from modulus.sym.key import Key
 from modulus.sym.node import Node
 
-# from modulus.sym.constants import JIT_PYTORCH_VERSION
 
 logger = logging.getLogger(__name__)
 

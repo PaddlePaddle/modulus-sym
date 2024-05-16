@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 # ==== Autodiff ====
 def gradient(y: paddle.Tensor, x: List[paddle.Tensor]) -> List[paddle.Tensor]:
     """
-    TorchScript function to compute the gradient of a tensor wrt multiple inputs
+    Paddle function to compute the gradient of a tensor wrt multiple inputs
     """
     # grad_outputs: List[Optional[paddle.Tensor]] = [paddle.ones_like(y)]
     grad = paddle.grad(
@@ -165,7 +165,7 @@ class MeshlessFiniteDerivative(paddle.nn.Layer):
     Parameters
     ----------
     model : paddle.nn.Layer
-        Forward torch module for calculating stencil values
+        Forward paddle module for calculating stencil values
     derivatives : List[Key]
         List of derivative keys to calculate
     dx : Union[float, Callable]
@@ -178,7 +178,7 @@ class MeshlessFiniteDerivative(paddle.nn.Layer):
     double_cast : bool, optional
         Cast fields to double precision to calculate derivatives, by default True
     jit : bool, optional
-        Use torch script for finite deriv calcs, by default True
+        Use paddle script for finite deriv calcs, by default True
 
     """
 

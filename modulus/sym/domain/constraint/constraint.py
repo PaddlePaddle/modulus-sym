@@ -137,7 +137,7 @@ class Constraint:
     @staticmethod
     def _set_device(tensor_dict, device=None, requires_grad=False):
 
-        # convert np to torch if needed
+        # convert np to paddle if needed
         tensor_dict = {
             key: paddle.to_tensor(
                 value, dtype=tf_dt, place=device, stop_gradient=not requires_grad
@@ -170,9 +170,8 @@ class Constraint:
 
         manager = DistributedManager()
 
-        # use persistent workers
-        # this is important for small datasets - torch would otherwise spend a lot of CPU overhead spawning workers each epoch
-        persistent_workers = True if num_workers > 0 else False
+        # keep use persistent workers to False
+        persistent_workers = False
 
         # map-style
         if isinstance(dataset, Dataset):

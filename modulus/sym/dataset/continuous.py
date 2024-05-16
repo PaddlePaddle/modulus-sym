@@ -172,7 +172,7 @@ class DictImportanceSampledPointwiseIterableDataset(
 
         def iterable_function():
 
-            # TODO: re-write idx calculation using pytorch sampling - to improve performance
+            # TODO: re-write idx calculation using paddle sampling - to improve performance
 
             counter = 0
             while True:

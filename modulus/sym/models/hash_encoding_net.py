@@ -114,7 +114,7 @@ class MultiresolutionHashNetArch(Arch):
         if len(self.params_var) == 0:
             self.params_var = None
 
-        # get device for torch constants used in inference
+        # get device for paddle constants used in inference
         self.place = DistributedManager().device
 
         # store hash grid parameters

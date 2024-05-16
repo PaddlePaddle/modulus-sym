@@ -269,7 +269,7 @@ Basic.__str__ = lambda self: CustomDerivativePrinter().doprint(self)
 
 # Class to compile and evaluate a sympy expression in Paddle
 # Cannot currently script this module because self.paddle_expr is unknown
-class SympyToTorch(paddle.nn.Layer):
+class SympyToPaddle(paddle.nn.Layer):
     def __init__(
         self,
         sympy_expr,

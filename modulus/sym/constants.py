@@ -36,8 +36,6 @@ np_dt = np.float32
 # tensorboard naming
 TF_SUMMARY = False
 
-# Pytorch Version for which JIT will be default on
-# JIT_PYTORCH_VERSION = "2.1.0a0+4136153"
 JIT_PADDLE_VERSION = None
 
 # No scaling is needed if using NO_OP_SCALE
