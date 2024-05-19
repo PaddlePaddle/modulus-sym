@@ -225,20 +225,20 @@ class Constraint:
             if isinstance(dataset, DictImportanceSampledPointwiseIterableDataset):
                 # NOTE: Do not wrap DictImportanceSampledPointwiseIterableDataset
                 # for CUDA operation is not supported in current paddle's DataLoader
-                # dataloader = dataset
-                if num_workers > 0:
-                    raise RuntimeError(
-                        f"num_workers({num_workers}) > 0 may cause CUDA error for CUDA"
-                        " operation is not supported in current paddle's DataLoader."
-                        " Please set num_workers=0 to avoid this error."
-                    )
-                dataloader = DataLoader(
-                    dataset,
-                    batch_size=None,
-                    num_workers=num_workers,
-                    worker_init_fn=dataset.worker_init_fn,
-                    # persistent_workers=persistent_workers,
-                )
+                dataloader = dataset
+                # if num_workers > 0:
+                #     raise RuntimeError(
+                #         f"num_workers({num_workers}) > 0 may cause CUDA error for CUDA"
+                #         " operation is not supported in current paddle's DataLoader."
+                #         " Please set num_workers=0 to avoid this error."
+                #     )
+                # dataloader = DataLoader(
+                #     dataset,
+                #     batch_size=None,
+                #     num_workers=num_workers,
+                #     worker_init_fn=dataset.worker_init_fn,
+                #     # persistent_workers=persistent_workers,
+                # )
             else:
                 # for iterable datasets, must do batching/sampling within dataset
                 dataloader = DataLoader(
