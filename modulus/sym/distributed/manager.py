@@ -166,9 +166,9 @@ class DistributedManager(object):
 
     @staticmethod
     def get_available_backend():
-        if paddle.device.cuda.device_count() <= 1:
-            return "nccl"
-        if paddle.device.cuda.device_count() > 1 and dist.get_backend() == "NCCL":
+        if paddle.device.cuda.device_count() >= 1 and (
+            not dist.parallel.is_initialized() or dist.get_backend() == "NCCL"
+        ):
             return "nccl"
         else:
             return "gloo"
