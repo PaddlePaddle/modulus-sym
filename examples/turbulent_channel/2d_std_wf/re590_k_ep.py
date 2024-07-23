@@ -16,7 +16,7 @@
 
 import paddle
 import numpy as np
-from sympy import Symbol, Eq, sin, cos, Min, Max, Abs, log, exp
+from sympy import Symbol, Function, Eq, sin, cos, Min, Max, Abs, log, exp
 
 import modulus.sym
 from modulus.sym.hydra import to_absolute_path, instantiate_arch, ModulusConfig
@@ -109,6 +109,9 @@ def run(cfg: ModulusConfig) -> None:
         frequencies_params=("axis", [i / 2 for i in range(8)]),
         cfg=cfg.arch.fourier,
     )
+    def Softplus(*symbols: Symbol):
+        return Function("softplus")(*symbols)
+
     nodes = (
         init.make_nodes()
         + eq.make_nodes()
@@ -119,8 +122,8 @@ def run(cfg: ModulusConfig) -> None:
                 "x_sin",
             )
         ]
-        + [Node.from_sympy(Min(log(1 + exp(Symbol("k_star"))) + 1e-4, 20), "k")]
-        + [Node.from_sympy(Min(log(1 + exp(Symbol("ep_star"))) + 1e-4, 180), "ep")]
+        + [Node.from_sympy(Min(Softplus(Symbol("k_star")) + 1e-4, 20), "k")] # use custom 'softplus' for numeric stability
+        + [Node.from_sympy(Min(Softplus(Symbol("ep_star")) + 1e-4, 180), "ep")] # use custom 'softplus' for numeric stability
         + [flow_net.make_node(name="flow_network")]
         + [p_net.make_node(name="p_network")]
         + [k_net.make_node(name="k_network")]
