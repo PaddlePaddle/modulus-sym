@@ -60,9 +60,13 @@ def paddle_lambdify(f, r, separable=False):
     else:
         vars = [k for k in r] if separable else [[k for k in r]]
         try:  # NOTE this fixes a very odd bug in SymPy TODO add issue to SymPy
-            lambdify_f = lambdify(vars, f, [PADDLE_SYMPY_PRINTER])
+            lambdify_f = lambdify(
+                vars, f, [{**PADDLE_SYMPY_PRINTER, **PADDLE_CUSTOM_SYMPY_PRINTER}]
+            )
         except:
-            lambdify_f = lambdify(vars, f, [PADDLE_SYMPY_PRINTER])
+            lambdify_f = lambdify(
+                vars, f, [{**PADDLE_SYMPY_PRINTER, **PADDLE_CUSTOM_SYMPY_PRINTER}]
+            )
     return lambdify_f
 
 
@@ -218,6 +222,11 @@ PADDLE_SYMPY_PRINTER = {
 }
 
 
+PADDLE_CUSTOM_SYMPY_PRINTER = {
+    "softplus": softplus,
+}
+
+
 class CustomDerivativePrinter(StrPrinter):
     def _print_Function(self, expr):
         """
@@ -254,7 +263,10 @@ def _subs_derivatives(expr):
     while True:
         try:
             fn = {
-                fn for fn in expr.atoms(Function) if fn.class_key()[1] == 0
+                fn for fn in expr.atoms(Function) if (
+                    fn.class_key()[1] == 0
+                    and fn.name not in PADDLE_CUSTOM_SYMPY_PRINTER
+                )
             }.pop()  # check if standard Sympy Eq (TODO better check)
             new_symbol_name = str(fn)
             expr = expr.subs(fn, Symbol(new_symbol_name))
