@@ -79,7 +79,14 @@ def _where_paddle(conditions, x, y):
 
 
 def _heaviside_paddle(x, values=0):
-    return paddle.maximum(paddle.sign(x), paddle.zeros([1, ]))
+    return paddle.maximum(
+        paddle.sign(x),
+        paddle.zeros(
+            [
+                1,
+            ]
+        ),
+    )
 
 
 def _sqrt_paddle(x):
@@ -186,6 +193,18 @@ def _dirac_delta_paddle(x):
     return paddle.equal(x=x, y=0.0)
 
 
+def softplus(x):
+    # Numeric stable version of softplus
+    THRESHOLD = 20.0
+    gt_mask = (x > THRESHOLD).astype(x.dtype)
+    le_mask = 1 - gt_mask
+    x_le = le_mask * x
+    y = gt_mask * x + le_mask * (  # keep the original value for x > THRESHOLD
+        paddle.log(1 + paddle.exp(x_le))
+    )  # compute 1+e^x for x <= THRESHOLD
+    return y
+
+
 PADDLE_SYMPY_PRINTER = {
     "abs": paddle.abs,
     "Abs": paddle.abs,
@@ -263,7 +282,9 @@ def _subs_derivatives(expr):
     while True:
         try:
             fn = {
-                fn for fn in expr.atoms(Function) if (
+                fn
+                for fn in expr.atoms(Function)
+                if (
                     fn.class_key()[1] == 0
                     and fn.name not in PADDLE_CUSTOM_SYMPY_PRINTER
                 )
