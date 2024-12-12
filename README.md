@@ -2,8 +2,7 @@
 # Modulus Symbolic (Beta)(Paddle Backend)
 
 <p align="center">
-<img src="https://pbs.twimg.com/profile_images/1145524454170062848/U4lxVYEw_400x400.png" alt="图片替代文本" height="100">
-<img src="https://github.com/PaddlePaddle/Paddle/blob/develop/doc/imgs/logo.png" alt="图片替代文本" height="100">
+<img src="https://github.com/PaddlePaddle/Paddle/blob/develop/doc/imgs/logo.png" alt="PaddleLogo" height="100">
 </p>
 
 > [!IMPORTANT]
