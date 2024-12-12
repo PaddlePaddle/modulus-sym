@@ -43,15 +43,11 @@ class JitManager(object):
 
         # Set the defaults
         if not hasattr(obj, "_enabled"):
-            obj._enabled = (
-                paddle.__version__ == "0.0.0"
-            ) and bool(os.getenv("to_static", "False").lower() == "true")
+            obj._enabled = False
         if not hasattr(obj, "_arch_mode"):
             obj._arch_mode = JitArchMode.ONLY_ACTIVATION
         if not hasattr(obj, "_use_cinn"):
-            obj._use_cinn = (
-                paddle.__version__ == "0.0.0"
-            )
+            obj._use_cinn = False
         if not hasattr(obj, "_use_prim"):
             obj._use_prim = False
         if not hasattr(obj, "_autograd_nodes"):
@@ -106,9 +102,7 @@ class JitManager(object):
             logger.info("Prim is enabled in modulus-sym(paddle backend)")
         if self.enabled:
             if self.use_cinn and not self.use_prim:
-                logger.warning(
-                    f"Please set FLAGS_prim_all=True when CINN is enabled"
-                )
+                logger.warning(f"Please set FLAGS_prim_all=True when CINN is enabled")
 
     @property
     def autograd_nodes(self):
@@ -153,7 +147,11 @@ class GraphManager(object):
 
     @func_arch.setter
     def func_arch(self, flag):
-        self._func_arch = flag
+        if flag:
+            logger.warning(
+                f"graph.funcarch is not supported in paddle, setting will be ignored"
+            )
+        # self._func_arch = flag
 
     @property
     def debug(self):

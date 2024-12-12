@@ -39,4 +39,4 @@ batch_size:
   Interior: 4000
 
 graph:
-  func_arch: true
+  func_arch: false

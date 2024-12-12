@@ -429,11 +429,6 @@ class Trainer(AdamMixin, AdaHessianMixin, BFGSMixin):
             num_losses=self.get_num_losses(),
         )
 
-        if self.cfg.jit:
-            raise NotImplementedError(
-                "JIT is not supported for Modulus with Paddle backend."
-            )
-
         if len(list(self.aggregator.parameters())) > 0:
             self.log.debug("Adding loss aggregator param group. LBFGS will not work!")
             self.optimizer.add_param_group(
@@ -682,10 +677,12 @@ class Trainer(AdamMixin, AdaHessianMixin, BFGSMixin):
                         elapsed_time = float(elapsed_time)
 
                     # print statement
-                    print_statement = (
-                        f"{self.step_str} lr: {self.optimizer.get_lr():10.3e}, loss: {float(loss):10.3e}"
+                    print_statement = f"{self.step_str} lr: {self.optimizer.get_lr():10.3e}, loss: {float(loss):10.3e}"
+                    eta_sec = (
+                        (self.max_steps - step)
+                        * (elapsed_time / self.print_stats_freq)
+                        / 1000
                     )
-                    eta_sec = (self.max_steps - step) * (elapsed_time / self.print_stats_freq) / 1000
                     eta_str = str(datetime.timedelta(seconds=int(eta_sec)))
                     if step >= self.initial_step + self.print_stats_freq:
                         print_statement += f", time/iteration: {elapsed_time / self.print_stats_freq:10.3e} ms, ETA: {eta_str}"
@@ -855,7 +852,8 @@ class Trainer(AdamMixin, AdaHessianMixin, BFGSMixin):
                 fail = colored("Fail loading optimizer: ", "red")
                 step = 0
                 log.info(
-                    fail + add_hydra_run_path(network_dir + "/optim_checkpoint.pdparams")
+                    fail
+                    + add_hydra_run_path(network_dir + "/optim_checkpoint.pdparams")
                 )
         else:
             log.warning("optimizer checkpoint not found")
@@ -937,7 +935,9 @@ class Trainer(AdamMixin, AdaHessianMixin, BFGSMixin):
             manager.group_rank("model_parallel") if manager.distributed else 0
         )
 
-        if os.path.exists(network_dir + f"/optim_checkpoint.{model_parallel_rank}.pdparams"):
+        if os.path.exists(
+            network_dir + f"/optim_checkpoint.{model_parallel_rank}.pdparams"
+        ):
             try:
                 checkpoint = paddle.load(
                     os.path.join(
