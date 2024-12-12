@@ -14,22 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import importlib
 from sympy import Symbol
 import numpy as np
 from pathlib import Path
-import pytest
 
 from modulus.sym.geometry.tessellation import Tessellation
 from modulus.sym.geometry import Parameterization
 
-
 dir_path = Path(__file__).parent
 
-@pytest.mark.skipif(
-    (importlib.util.find_spec("pysdf") is None) or (getattr(importlib.util.find_spec("pysdf"), "sdf", None) is None),
-    reason="nvidia-modulus pysdf not installed",
-)
+
 def test_tesselated_geometry():
     # read in cube file
     cube = Tessellation.from_stl(dir_path / "stls/cube.stl")

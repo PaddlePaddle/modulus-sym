@@ -26,10 +26,10 @@ repos:
 #     hooks:
 #     - id: interrogate
 #       args: [
-#           "-vv", "--ignore-init-method", "--ignore-init-module", 
-#           "--ignore-module", "--ignore-private", "--ignore-semiprivate", 
-#           "--ignore-magic", "--fail-under=20", "--exclude=['setup.py', 'test', 'build', 'docs']",  
-#           "--ignore-regex=['forward', 'backward', 'reset_parameters', 'extra_repr', 'MetaData', 'apply_activation','exec_activation']", 
+#           "-vv", "--ignore-init-method", "--ignore-init-module",
+#           "--ignore-module", "--ignore-private", "--ignore-semiprivate",
+#           "--ignore-magic", "--fail-under=20", "--exclude=['setup.py', 'test', 'build', 'docs']",
+#           "--ignore-regex=['forward', 'backward', 'reset_parameters', 'extra_repr', 'MetaData', 'apply_activation','exec_activation']",
 #           "--color", "--"]
 
 # -   repo: https://github.com/igorshubovych/markdownlint-cli
@@ -44,4 +44,4 @@ repos:
       entry: python test/ci_tests/header_check.py
       language: python
       pass_filenames: false
-      exclude-dir: [./modulus/sym/utils_aux]
+      exclude: ^modulus/sym/utils_aux/

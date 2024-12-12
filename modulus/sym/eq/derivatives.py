@@ -31,7 +31,7 @@ Tensor = paddle.Tensor
 logger = logging.getLogger(__name__)
 
 # ==== Autodiff ====
-def gradient(y: paddle.Tensor, x: List[paddle.Tensor]) -> List[paddle.Tensor]:
+def gradient_autodiff(y: paddle.Tensor, x: List[paddle.Tensor]) -> List[paddle.Tensor]:
     """
     Paddle function to compute the gradient of a tensor wrt multiple inputs
     """
@@ -97,7 +97,7 @@ class Derivative(paddle.nn.Layer):
         for var_name, grad_sizes in self.gradient_dict.items():
             var = input_var[var_name]
             grad_var = self.prepare_input(input_var, grad_sizes.keys())
-            grad = gradient(var, grad_var)
+            grad = gradient_autodiff(var, grad_var)
             grad_dict = {
                 name: grad[i] for i, name in enumerate(self.gradient_names[var_name])
             }

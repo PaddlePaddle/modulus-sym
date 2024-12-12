@@ -200,7 +200,7 @@ def main():
         print("test_header.py found the following files that might have GPL copyright:")
         for _file in gpl_files:
             print(_file)
-    assert len(problematic_files) == 0, "header test failed!"
+    assert len(problematic_files) == 0, f"header test failed!: {problematic_files}"
     assert len(gpl_files) == 0, "found gpl license, header test failed!"
 
     print("Success: File headers look good!")
