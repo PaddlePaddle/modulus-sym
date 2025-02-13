@@ -116,7 +116,15 @@ Quickly run a simple exmaple: `ldc_2d.py` with script below.
 
 ``` sh
 cd ./examples/ldc/
+
+# run on dynamic(i.e. eager mode) graph mode
 python ldc_2d.py
+
+# run on dy2st mode
+python ldc_2d.py jit=true
+
+# run on cinn mode(i.e. compiled mode, recommended for performance)
+python ldc_2d.py jit=true jit_use_cinn=true
 ```
 
 ## Contributing

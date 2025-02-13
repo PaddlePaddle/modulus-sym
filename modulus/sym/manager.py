@@ -79,6 +79,20 @@ class JitManager(object):
         self._enabled = flag
 
     @property
+    def use_prim(self):
+        return self._use_prim
+
+    @use_prim.setter
+    def use_prim(self, flag):
+        self._use_prim = flag
+        if flag:
+            logger.info("Prim is enabled in modulus-sym(paddle backend)")
+        if self.enabled:
+            paddle.framework.core._set_prim_all_enabled(self.enabled)
+        else:
+            paddle.framework.core.set_prim_eager_enabled(self.enabled)
+
+    @property
     def use_cinn(self):
         return self._use_cinn
 
@@ -89,20 +103,11 @@ class JitManager(object):
             logger.info("CINN is enabled in modulus-sym(paddle backend)")
         backend = "CINN" if flag else None
         if self.enabled:
-            logger.info(f"JIT using the {backend} backend")
-
-    @property
-    def use_prim(self):
-        return self._use_prim
-
-    @use_prim.setter
-    def use_prim(self, flag):
-        self._use_prim = flag
-        if flag:
-            logger.info("Prim is enabled in modulus-sym(paddle backend)")
-        if self.enabled:
-            if self.use_cinn and not self.use_prim:
-                logger.warning(f"Please set FLAGS_prim_all=True when CINN is enabled")
+            if not self.use_prim:
+                self.use_prim = True
+                logger.warning(
+                    "Automatically set jit_use_prim=True as jit_use_cinn is enabled"
+                )
 
     @property
     def autograd_nodes(self):
@@ -115,9 +120,10 @@ class JitManager(object):
     def __repr__(self):
         return f"JitManager: {self._shared_state}"
 
-    def init(self, enabled, arch_mode, use_cinn, autograd_nodes):
+    def init(self, enabled, arch_mode, use_prim, use_cinn, autograd_nodes):
         self.enabled = enabled
         self.arch_mode = arch_mode
+        self.use_prim = use_prim
         self.use_cinn = use_cinn
         self.autograd_nodes = autograd_nodes
 
