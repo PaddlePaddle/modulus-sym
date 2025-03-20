@@ -106,9 +106,9 @@ class Constraint:
         jit_manager = JitManager()
         if jit_manager.enabled:
             from paddle import jit
-            from paddle import static
+            backend = "CINN" if jit_manager.use_cinn else None
             self.model.forward = jit.to_static(
-                backend="CINN",
+                backend=backend,
                 full_graph=True,
             )(self.model.forward)
 
