@@ -107,10 +107,8 @@ class Constraint:
         if jit_manager.enabled:
             from paddle import jit
             from paddle import static
-            build_strategy = static.BuildStrategy()
-            build_strategy.build_cinn_pass = jit_manager.use_cinn
             self.model.forward = jit.to_static(
-                build_strategy=build_strategy,
+                backend="CINN",
                 full_graph=True,
             )(self.model.forward)
 
