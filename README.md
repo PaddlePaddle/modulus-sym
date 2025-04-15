@@ -121,10 +121,10 @@ cd ./examples/ldc/
 python ldc_2d.py
 
 # run on dy2st mode
-python ldc_2d.py jit=true
+python ldc_2d.py jit=true jit_use_cinn=false
 
 # run on cinn mode(i.e. compiled mode, recommended for performance)
-python ldc_2d.py jit=true jit_use_cinn=true
+python ldc_2d.py jit=true
 ```
 
 ## Contributing
